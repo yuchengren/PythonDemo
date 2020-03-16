@@ -118,8 +118,13 @@ def send_appQRCodeURL_to_dingtalk():
     buildQRCodeURL = fileAndroidUrl + qrcodePath + qrcodeImgName
     print("qrcodeUrl=" + buildQRCodeURL)
 
-    atMobileString = os.getenv("at_mobiles", "").strip()
+    atPersonsString = os.getenv("at_persons", "").strip()  # 选择已经录入的人
+    atMobileString = os.getenv("at_mobiles", "").strip()   # 指定手机号
     remark_msg = os.getenv("remark_msg", "").strip()
+    print(atPersonsString)
+    if len(atPersonsString) != 0 and atPersonsString[len(atPersonsString) - 1] != ",":
+        concatChar = "," if atPersonsString[len(atPersonsString) - 1] != "," else ""
+        atMobileString = atPersonsString + concatChar + atMobileString
     if len(atMobileString) == 0:
         atMobileList = []
     else:
@@ -129,7 +134,7 @@ def send_appQRCodeURL_to_dingtalk():
         if len(mobile) != 11:
             continue
         remarkString = remarkString + ("@" + mobile + " ")
-    remarkString = remarkString + remark_msg:
+    remarkString = remarkString + remark_msg
     if len(remarkString) != 0:
         remarkString = " \n* " + remarkString
     # 配置发送dingtalk通知的请求参数
@@ -137,8 +142,8 @@ def send_appQRCodeURL_to_dingtalk():
             "actionCard": {
                 "title": copyApkName,
                 "text": "**" + copyApkName + "** \n* " +
-                        commit + " \n* " +
-                        msg + remarkString,
+                        msg + " \n* " +
+                        commit + remarkString,
                 "hideAvatar": "0",
                 "btnOrientation": "1",
                 "btns": [
