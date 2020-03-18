@@ -78,8 +78,7 @@ def checkAndGetInCustomer(driver):
     # 点击揽入
     driver.find_element_by_class_name("j60bgz6").find_elements_by_class_name("ant-btn")[1].click()
     getInDialog = WebDriverWait(driver, 5).until(EC.visibility_of_element_located((By.CLASS_NAME, "ant-modal-content")))
-    getInDialog.find_element_by_class_name("ant-btn").click()  # 取消按钮
-    # getInDialog.find_element_by_class_name("ant-btn-primary").click()  # 确定按钮
+    getInDialog.find_element_by_class_name("ant-btn-primary").click()  # 确定按钮
     time.sleep(0.05)
 
 

@@ -8,6 +8,12 @@ FORMAT_YEAR_MONTH_DAY_HYPHEN = "%Y-%m-%d"
 weekend_list = [5, 6]
 
 
+def isToday(timestamp: float):
+    today = datetime.datetime.now()
+    timestamp_day = datetime.datetime.fromtimestamp(timestamp)
+    return today.year == timestamp_day.year and today.month == timestamp_day.month and today.day == timestamp_day.day
+
+
 def todayWeekday():
     return datetime.datetime.now().weekday()
 
