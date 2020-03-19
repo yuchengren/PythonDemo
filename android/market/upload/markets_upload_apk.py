@@ -18,13 +18,13 @@ update_msg = "修复已知问题\n提升用户体验"
 
 market_list = [
     MarketChannel.xiaomi,
-    # MarketChannel.oppo,
+    MarketChannel.oppo,
     # MarketChannel.vivo,
     # MarketChannel.tencent,
     # MarketChannel.huawei,
 ]
 isAutoCommit = False  # 最后一步 是否自动提交 建议设为False 人为核对信息后 再手动点击提交
-isCheckChannelApkZipToday = True  # 是否校验渠道apk压缩包是否是今天的
+isCheckChannelApkZipToday = False  # 是否校验渠道apk压缩包是否是今天的
 
 
 def unzipChannelApkZip():

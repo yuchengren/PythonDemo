@@ -39,12 +39,12 @@ canAddFollowUpDayList = []
 canAddFollowUpDayDict = {}
 canAddFollowUpDay = today + datetime.timedelta(days=1)
 while len(canAddFollowUpDayList) < maxFollowUpForwardDays:
-    print(canAddFollowUpDay)
     if TimeUtils.isWeekday(canAddFollowUpDay):
         canAddFollowUpDayList.append(TimeUtils.formatToDayStr(canAddFollowUpDay))
     canAddFollowUpDay = canAddFollowUpDay + datetime.timedelta(days=1)
 print(canAddFollowUpDayList)
 currentAllocateDate = canAddFollowUpDayList[0]
+print("currentAllocateDate = %s" % currentAllocateDate)
 mainWindow = driver.current_window_handle
 WebDriverWait(driver, 10).until(EC.visibility_of_element_located((By.CLASS_NAME, "_1VePUHA")))  # 筛选条件区域
 
@@ -102,16 +102,18 @@ for i in canAddFollowUpDayList:
     canAddFollowUpDayDict[i] = getListTotalNumber()
 print(canAddFollowUpDayDict)
 
-# os._exit(0)
 #  获取跟进日期在今天以前的数据列表
 resetNextFollowUpTimesAndSearchAgain("", nextFollowUpEndDay)
 listElement = WebDriverWait(driver, 10).until(EC.visibility_of_element_located((By.CLASS_NAME, "ant-table-tbody")))
 listRows = listElement.find_elements_by_class_name("ant-table-row")
 nextPageElement = None
 
-while nextPageElement is None or nextPageElement.is_enabled():
+while nextPageElement is None or nextPageElement.get_attribute("aria-disabled") == "false":
     if nextPageElement is not None:
-        nextPageElement.click()
+        if nextPageElement.get_attribute("aria-disabled") == "false":
+            nextPageElement.click()
+        else:
+            os._exit(1)
     WebDriverWait(driver, 10).until_not(
         EC.visibility_of_element_located((By.CLASS_NAME, "ant-table-spin-holder")))
     time.sleep(0.5)
@@ -136,7 +138,9 @@ while nextPageElement is None or nextPageElement.is_enabled():
         fullFollowUpDayCount = 0
         for (k, v) in canAddFollowUpDayDict.items():
             if v < maxEachDayFollowUpNumber:
-                currentAllocateDate = k
+                if currentAllocateDate != k:
+                    currentAllocateDate = k
+                    print("currentAllocateDate = %s" % k)
                 break
             else:
                 fullFollowUpDayCount += 1
@@ -150,6 +154,7 @@ while nextPageElement is None or nextPageElement.is_enabled():
             elif lastFollowUpDayWeekDay == 5:
                 needForwardDays = 2
             currentAllocateDate = TimeUtils.formatToDayStr(TimeUtils.addDays(lastFollowUpDay, needForwardDays))
+            print("currentAllocateDate = %s" % currentAllocateDate)
             canAddFollowUpDayDict[currentAllocateDate] = 0
 
         nextFollowUpDateElement = nextFollowUpDatePop.find_element_by_class_name("ant-calendar-input")

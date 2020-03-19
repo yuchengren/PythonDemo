@@ -38,28 +38,4 @@ class IMarketUpload:
                 apkPath = os.path.join(parent_path, f)
         return apkPath
 
-    def findLocalApkFile(self):
-        apkPath = ""
-        files = os.listdir(market_config.apk_zip_parent_path)
-        for f in files:
-            file_path = os.path.join(market_config.apk_zip_parent_path, f)
-            base_name = os.path.basename(f)
-            modify_time = os.path.getmtime(file_path)
-            if base_name == market_config.apk_dir_name and os.path.isdir(file_path) and TimeUtils.isToday(modify_time):
-                apkPath = self.findMarketApkFile(os.path.join(market_config.apk_zip_parent_path, market_config.apk_dir_name))
-                if len(apkPath) != 0:
-                    return apkPath
-            elif base_name == market_config.apk_zip_name and TimeUtils.isToday(modify_time):
-                zip_files = zipfile.ZipFile(os.path.join(market_config.apk_zip_parent_path, f))
-                apk_dir = os.path.join(market_config.apk_zip_parent_path, market_config.apk_dir_name)
-                if os.path.exists(apk_dir):
-                    FileUtils.deleteFile(apk_dir)
-                else:
-                    os.makedirs(apk_dir)
-                for apk_name in zip_files.namelist():
-                    zip_files.extract(apk_name, market_config.apk_zip_parent_path)
-                zip_files.close()
-                return self.findMarketApkFile(os.path.join(market_config.apk_zip_parent_path, market_config.apk_dir_name))
-        return apkPath
-
 

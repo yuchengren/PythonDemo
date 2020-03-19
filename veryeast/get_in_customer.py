@@ -24,6 +24,8 @@ driver = webdriver.Chrome(options=options)
 bg_system_login.login(driver)
 select_three_menus.select(driver, first_menu_index, second_menu_index, third_menu_index)
 
+# os._exit(0)
+
 # 私有配置项
 public_sea_condition_index = ConditionEnums.PublicSeaEnum.ve_marketing_center.value  # 筛选条件-所属公海
 customer_source_index = ConditionEnums.CustomerSource.very_east_register.value  # 筛选条件-客户来源
