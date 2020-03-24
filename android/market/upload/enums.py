@@ -1,8 +1,8 @@
 from enum import Enum, unique
 
-# app的类型
-@unique
-class AppType(Enum):
+
+# app的名称
+class AppName:
     mockuai_star_seller = "魔筷星选商家"  # 魔筷星选商家
     mockuai_star_buyer = "魔筷星选"  # 魔筷星选
     penguin_shop_seller = "企鹅小店商家"  # 企鹅小店商家
@@ -10,8 +10,7 @@ class AppType(Enum):
 
 
 # 应用市场
-@unique
-class MarketChannel(Enum):
+class MarketChannel:
     mockuai = "mockuai"  # 魔筷官网
     huawei = "huawei"  # 华为
     xiaomi = "xiaomi"  # 小米

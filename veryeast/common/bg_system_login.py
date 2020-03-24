@@ -28,8 +28,8 @@ def login(driver: WebDriver):
     inputUserNameElement = driver.find_element_by_id("username")
     inputUserNameElement.send_keys(veryeast.config.veryeast_info.USER_NAME)
     # 输入密码
-    inputUserNameElement = driver.find_element_by_id("password")
-    inputUserNameElement.send_keys(veryeast.config.veryeast_info.PASSWORD)
+    inputPasswordElement = driver.find_element_by_id("password")
+    inputPasswordElement.send_keys(veryeast.config.veryeast_info.PASSWORD)
 
     # 识别验证码
     # 获取验证码位置信息
@@ -79,9 +79,9 @@ def login(driver: WebDriver):
         loginElement = None
 
     while loginElement is not None:
-        inputUserNameElement = driver.find_element_by_id("password")
-        if len(inputUserNameElement.get_attribute('value').strip()) == 0:
-            inputUserNameElement.send_keys(veryeast.config.veryeast_info.PASSWORD)
+        inputPasswordElement = driver.find_element_by_id("password")
+        if len(inputPasswordElement.get_attribute('value').strip()) == 0:
+            inputPasswordElement.send_keys(veryeast.config.veryeast_info.PASSWORD)
             verifyCodeElement = driver.find_element_by_id("Txtidcode")
             driver.execute_script("arguments[0].focus();", verifyCodeElement)
         time.sleep(5)

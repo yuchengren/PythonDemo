@@ -8,7 +8,7 @@ from selenium.webdriver.support import expected_conditions as EC
 
 from android.market.config import market_urls, market_accounts, market_config
 from android.market.upload.IMarketUpload import IMarketUpload
-from android.market.upload.enums import AppType
+from android.market.upload.enums import AppName
 
 
 class XiaomiMarketUpload(IMarketUpload):
@@ -27,7 +27,7 @@ class XiaomiMarketUpload(IMarketUpload):
         app_list = WebDriverWait(self.driver, 10).until(EC.visibility_of_element_located((By.CLASS_NAME, "game-list")))
         apps = app_list.find_elements_by_class_name("list-item")
         for app in apps:
-            if self.app_name.value in app.find_element_by_class_name("game-name").text.strip():
+            if self.app_name == app.find_element_by_class_name("game-name").text.strip():
                 update_app_version = app.find_element_by_class_name("games-operate").find_elements_by_class_name("btn")[0]
                 if "myicon-edit" in update_app_version.get_attribute("class"):
                     self.is_editing = True

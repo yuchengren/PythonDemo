@@ -50,8 +50,11 @@ def captchaScreenShot(driver: WebDriver, imgFilePath, devicePixelRatio):
     verifyCodeImg = verifyCodeImg.convert('L')  # 转换模式 L|RGB
     verifyCodeImg = ImageEnhance.Contrast(verifyCodeImg)  # 增强对比度
     verifyCodeImg = verifyCodeImg.enhance(2.0)  # 增加饱和度
+
+    verifyCodeImg = verifyCodeImg.resize((int(verifyCodeImgSize['width']),
+                                         int(verifyCodeImgSize['height'])))  # 缩放至原图大小
     verifyCodeImg.save(imgFilePath)
-    time.sleep(0.5)
+    # time.sleep(0.5)
 
 
 def inputPwdCaptchaAndLogin(driver: WebDriver, imgFilePath, devicePixelRatio):
@@ -60,7 +63,7 @@ def inputPwdCaptchaAndLogin(driver: WebDriver, imgFilePath, devicePixelRatio):
     inputPasswordElement = driver.find_element_by_id("password")
     inputPasswordElement.send_keys(veryeast.config.veryeast_info.PASSWORD)
     verifyCode = recognize_captcha(imgFilePath)
-    print("verifyCode = %s" % verifyCode)
+    print("recognize verifyCode = %s" % verifyCode)
     # 输入验证码
     verifyCodeElement = driver.find_element_by_id("Txtidcode")
     verifyCodeElement.send_keys(verifyCode)

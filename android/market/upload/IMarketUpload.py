@@ -4,7 +4,7 @@ import zipfile
 from selenium import webdriver
 
 from android.market.config import market_config
-from android.market.upload.enums import AppType
+from android.market.upload.enums import AppName
 from base.utils import TimeUtils, FileUtils
 
 
@@ -34,7 +34,7 @@ class IMarketUpload:
         files = os.listdir(parent_path)
         for f in files:
             base_name = os.path.basename(f)
-            if self.market_channel.value in base_name and base_name.endswith(".apk"):
+            if self.market_channel in base_name and base_name.endswith(".apk"):
                 apkPath = os.path.join(parent_path, f)
         return apkPath
 
