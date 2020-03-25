@@ -8,6 +8,7 @@ from selenium.webdriver.chrome.webdriver import WebDriver
 from android.market.config import market_config
 from android.market.upload.enums import MarketChannel, AppName
 from android.market.upload.oppo_market_upload import OppoMarketUpload
+from android.market.upload.tencent_market_upload import TencentMarketUpload
 from android.market.upload.vivo_market_upload import VivoMarketUpload
 from android.market.upload.xiaomi_market_upload import XiaomiMarketUpload
 from base.utils import FileUtils, TimeUtils
@@ -58,6 +59,8 @@ def upload(_app_name, market_channel, _apk_dir_path):
         marketUploadObj = OppoMarketUpload(market_channel, _app_name, apk_dir_path)
     elif market_channel == MarketChannel.vivo:
         marketUploadObj = VivoMarketUpload(market_channel, _app_name, apk_dir_path)
+    elif market_channel == MarketChannel.tencent:
+        marketUploadObj = TencentMarketUpload(market_channel, _app_name, apk_dir_path)
     if marketUploadObj is None:
         return
     marketUploadObj.login()

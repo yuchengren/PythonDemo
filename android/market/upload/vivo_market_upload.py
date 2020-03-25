@@ -20,12 +20,14 @@ class VivoMarketUpload(IMarketUpload):
 
     def login(self):
         self.driver.get(market_urls.vivo_market_apps_page)
-        login_btn = WebDriverWait(self.driver, 10).until(EC.visibility_of_element_located((By.CLASS_NAME, "btn-event")))
-        self.driver.find_element_by_name("name").send_keys(market_accounts.vivo_market_username)
+        username_input = WebDriverWait(self.driver, 10).until(EC.visibility_of_element_located((By.NAME, "name")))
+        username_input.send_keys(market_accounts.vivo_market_username)
+        login_btn = self.driver.find_element_by_class_name("btn-event")
         while login_btn is not None:
-            login_btn = self.inputPasswordAndCapture(self.driver, market_accounts.vivo_market_password)
+            login_btn = self.input_password_and_captcha(self.driver, market_accounts.vivo_market_password)
 
-    def inputPasswordAndCapture(self, _driver: WebDriver, password):
+    @staticmethod
+    def input_password_and_captcha(_driver: WebDriver, password):
         captcha_elements = ElementUtils.findElements(_driver, By.NAME, "verificationCode")
         login_btn = ElementUtils.findElement(_driver, By.CLASS_NAME, "btn-event")
         inputPasswordElement = _driver.find_element_by_name("password")
@@ -46,9 +48,13 @@ class VivoMarketUpload(IMarketUpload):
     def select_app(self):
         # 管理中心按钮
         WebDriverWait(self.driver, 10).until(EC.visibility_of_element_located((By.CLASS_NAME, "manage-warp"))).click()
-        WebDriverWait(self.driver, 10).until(EC.visibility_of_element_located((By.CLASS_NAME, "el-dialog--center")))
-        webdriver.ActionChains(self.driver).send_keys(Keys.ESCAPE).perform()  # 管理中心的通知弹窗 esc 等效于关闭按钮(class="el-button")
-        WebDriverWait(self.driver, 10).until_not(EC.visibility_of_element_located((By.CLASS_NAME, "el-dialog--center")))
+        time.sleep(0.2)
+        dialog_remind = ElementUtils.findElement(self.driver, By.CLASS_NAME, "el-dialog--center")
+        if dialog_remind is not None:
+            webdriver.ActionChains(self.driver).send_keys(
+                Keys.ESCAPE).perform()  # 管理中心的通知弹窗 esc 等效于关闭按钮(class="el-button")
+            WebDriverWait(self.driver, 10).until_not(
+                EC.visibility_of_element_located((By.CLASS_NAME, "el-dialog--center")))
         app_and_game = WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable((By.XPATH, '//*[@id="page-template"]/div[2]/div[3]/ul/li[1]')))
         self.driver.execute_script("arguments[0].click();", app_and_game)
         app_list = WebDriverWait(self.driver, 10).until(EC.visibility_of_element_located((By.CLASS_NAME, "el-table__body-wrapper")))
