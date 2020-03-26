@@ -7,6 +7,7 @@ from selenium.webdriver.chrome.webdriver import WebDriver
 
 from android.market.config import market_config
 from android.market.upload.enums import MarketChannel, AppName
+from android.market.upload.huawei_market_upload import HuaweiMarketUpload
 from android.market.upload.oppo_market_upload import OppoMarketUpload
 from android.market.upload.tencent_market_upload import TencentMarketUpload
 from android.market.upload.vivo_market_upload import VivoMarketUpload
@@ -21,8 +22,8 @@ update_msg = "【优化】\n修复已知问题，优化用户体验\n更多细�
 market_list = [
     # MarketChannel.xiaomi,
     # MarketChannel.oppo,
-    MarketChannel.vivo,
-    # MarketChannel.tencent,
+    # MarketChannel.vivo,
+    MarketChannel.tencent,
     # MarketChannel.huawei,
 ]
 isAutoCommit = False  # 最后一步 是否自动提交 建议设为False 人为核对信息后 再手动点击提交
@@ -61,6 +62,8 @@ def upload(_app_name, market_channel, _apk_dir_path):
         marketUploadObj = VivoMarketUpload(market_channel, _app_name, apk_dir_path)
     elif market_channel == MarketChannel.tencent:
         marketUploadObj = TencentMarketUpload(market_channel, _app_name, apk_dir_path)
+    elif market_channel == MarketChannel.huawei:
+        marketUploadObj = HuaweiMarketUpload(market_channel, _app_name, apk_dir_path)
     if marketUploadObj is None:
         return
     marketUploadObj.login()

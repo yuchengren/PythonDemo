@@ -12,6 +12,8 @@ from base.config import email_urls
 from base.selenium import ElementUtils
 from base.utils import TimeUtils
 
+captcha_check_interval = 5 * 60
+
 
 def login(driver: WebDriver, username, password):
     main_window = driver.current_window_handle
@@ -84,7 +86,7 @@ def getCaptcha(driver: WebDriver, isFirstGet, title_filter, content_filter):
 
         if title_filter in item.find_element_by_class_name("maillist_item_rcp_inner").text and \
                 content_filter in item.find_element_by_class_name("maillist_item_summary_inner").text and \
-                interval_now_seconds < 5 * 60:
+                interval_now_seconds < captcha_check_interval:
             item.click()
             email_content_iframe = WebDriverWait(driver, 10).until(
                 EC.visibility_of_element_located((By.CLASS_NAME, "read_iframe")))

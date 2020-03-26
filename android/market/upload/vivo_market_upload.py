@@ -76,6 +76,8 @@ class VivoMarketUpload(IMarketUpload):
         update_msg_input = self.driver.find_elements_by_class_name("el-textarea__inner")[1]
         self.driver.execute_script("arguments[0].value='';", update_msg_input)
         update_msg_input.send_keys(update_msg)
+        # 发布时间 审核通过后立即发布
+        self.driver.find_elements_by_class_name("el-radio__input")[0].click()
         # 上传进度
         WebDriverWait(self.driver, 10).until(EC.visibility_of_element_located((By.CLASS_NAME, "el-progress-bar")))
         WebDriverWait(self.driver, 10).until_not(EC.visibility_of_element_located((By.CLASS_NAME, "el-progress-bar")))

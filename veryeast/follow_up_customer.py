@@ -25,6 +25,7 @@ third_menu_index = ConditionEnums.PersonalConsoleChildMenu.my_customer.value
 maxEachDayFollowUpNumber = 55
 conditionNextFollowUpIntervalDay = 14  # 下次跟进开始日期和结束日期的间隔天数
 maxFollowUpForwardDays = 5  # 跟进客户日期推前的最大天数
+follow_up_first_day_interval_today = 1
 # 浏览器
 options = webdriver.ChromeOptions()
 driver = webdriver.Chrome(options=options)
@@ -37,7 +38,7 @@ nextFollowUpEndDay = TimeUtils.formatToDayStr(today)
 
 canAddFollowUpDayList = []
 canAddFollowUpDayDict = {}
-canAddFollowUpDay = today + datetime.timedelta(days=1)
+canAddFollowUpDay = today + datetime.timedelta(days=follow_up_first_day_interval_today)
 while len(canAddFollowUpDayList) < maxFollowUpForwardDays:
     if TimeUtils.isWeekday(canAddFollowUpDay):
         canAddFollowUpDayList.append(TimeUtils.formatToDayStr(canAddFollowUpDay))
