@@ -68,7 +68,7 @@ class TencentMarketUpload(IMarketUpload):
         self.driver.find_elements_by_class_name("ui-radio")[2].click()  # 审核后立即发布
         # 上传进度
         WebDriverWait(self.driver, 10).until(EC.presence_of_element_located((By.CLASS_NAME, "webuploader-container-hide")))
-        WebDriverWait(self.driver, 10).until_not(EC.presence_of_element_located((By.CLASS_NAME, "webuploader-container-hide")))
+        WebDriverWait(self.driver, self.upload_time_check).until_not(EC.presence_of_element_located((By.CLASS_NAME, "webuploader-container-hide")))
         # 提交审核
         if is_auto_commit:
             self.driver.find_element_by_id("j-submit-btn").click()

@@ -1,2 +1,4 @@
 .idea/
 veryeast/config/veryeast_info.py
+android/market/config/mockuai_config.py
+android/market/config/haoyina_config.py

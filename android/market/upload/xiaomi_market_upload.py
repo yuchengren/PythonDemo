@@ -36,7 +36,7 @@ class XiaomiMarketUpload(IMarketUpload):
         self.driver.find_element_by_tag_name("input").send_keys(apk_file)
         # 上传进度
         WebDriverWait(self.driver, 10).until(EC.visibility_of_element_located((By.CLASS_NAME, "progress-bar")))
-        WebDriverWait(self.driver, 300).until_not(EC.visibility_of_element_located((By.CLASS_NAME, "progress-bar")))
+        WebDriverWait(self.driver, self.upload_time_check).until_not(EC.visibility_of_element_located((By.CLASS_NAME, "progress-bar")))
         # 完善资料页面外层
         choose_timed = WebDriverWait(self.driver, 10).until(EC.visibility_of_element_located((By.ID, "choose_timed")))
         Select(choose_timed).select_by_value("notimed")  # 审核通过后立即上线

@@ -112,8 +112,8 @@ class HuaweiMarketUpload(IMarketUpload):
         # 上传包弹窗
         upload_apk_dialog = WebDriverWait(self.driver, 10).until(EC.visibility_of_element_located((By.ID, "spliceUploderContainer")))
         WebDriverWait(self.driver, 10).until(EC.visibility_of_element_located((By.CLASS_NAME, "uploader-element-invisible"))).send_keys(apk_file)
-        WebDriverWait(self.driver, 10).until_not(EC.visibility_of_element_located((By.ID, "spliceUploderContainer")))
-        WebDriverWait(self.driver, 10).until_not(EC.visibility_of_element_located((By.CLASS_NAME, "packageSelectDialog")))
+        # WebDriverWait(self.driver, 10).until_not(EC.visibility_of_element_located((By.ID, "spliceUploderContainer")))
+        WebDriverWait(self.driver, self.upload_time_check).until_not(EC.visibility_of_element_located((By.CLASS_NAME, "packageSelectDialog")))
         # 绿色应用申请 点击不申请
         self.driver.find_element_by_id("VerInfoNotApplyButton").click()
         # 发布时间
@@ -121,6 +121,7 @@ class HuaweiMarketUpload(IMarketUpload):
         # 提交审核
         if is_auto_commit:
             self.driver.find_element_by_id("VerInfoSubmitButton").click()
+            # 会有确认弹窗
 
 
 

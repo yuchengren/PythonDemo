@@ -11,6 +11,7 @@ from base.utils import TimeUtils, FileUtils
 class IMarketUpload:
 
     def __init__(self, market_channel, app_name, apk_dir_path):
+        self.upload_time_check = 60
         self.market_channel = market_channel
         self.app_name = app_name
         self.apk_dir_path = apk_dir_path

@@ -69,20 +69,22 @@ class VivoMarketUpload(IMarketUpload):
                 row.click()
                 break
         # 点击版本升级
-        WebDriverWait(self.driver, 10).until(EC.visibility_of_element_located((By.CLASS_NAME, "el-button--warning"))).click()
+        WebDriverWait(self.driver, 10).until(EC.visibility_of_element_located((By.CLASS_NAME, "app-top-detail"))).click()
+        WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable((By.CLASS_NAME, "el-button--warning"))).click()
 
     def upload(self, apk_file, update_msg, is_auto_commit):
         apk_input = WebDriverWait(self.driver, 10).until(EC.presence_of_element_located((By.CLASS_NAME, "el-upload__input")))
         apk_input.send_keys(apk_file)
+        # 上传进度 要等待 上传完成之后 发布时间 才会显示
+        WebDriverWait(self.driver, 10).until(EC.visibility_of_element_located((By.CLASS_NAME, "el-progress-bar")))
+        WebDriverWait(self.driver, self.upload_time_check).until_not(EC.visibility_of_element_located((By.CLASS_NAME, "el-progress-bar")))
         # 新版说明
         update_msg_input = self.driver.find_elements_by_class_name("el-textarea__inner")[1]
         self.driver.execute_script("arguments[0].value='';", update_msg_input)
         update_msg_input.send_keys(update_msg)
         # 发布时间 审核通过后立即发布
-        self.driver.find_elements_by_class_name("el-radio__input")[0].click()
-        # 上传进度
-        WebDriverWait(self.driver, 10).until(EC.visibility_of_element_located((By.CLASS_NAME, "el-progress-bar")))
-        WebDriverWait(self.driver, 10).until_not(EC.visibility_of_element_located((By.CLASS_NAME, "el-progress-bar")))
+        release_time_els = WebDriverWait(self.driver, 10).until(EC.visibility_of_all_elements_located((By.CLASS_NAME, "el-radio__input")))
+        release_time_els[0].find_element_by_class_name("el-radio__inner").click()
         # 提交
         if is_auto_commit:
             self.driver.find_element_by_class_name("button-wrap").find_element_by_class_name("el-button--primary").click()

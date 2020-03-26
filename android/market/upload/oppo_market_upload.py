@@ -25,10 +25,19 @@ class OppoMarketUpload(IMarketUpload):
         password_div.find_element_by_tag_name("input").send_keys(self.account_info[1])
         login_btn = self.driver.find_element_by_class_name("passlogin").find_element_by_class_name("primary_btn")
         login_btn.click()
-        time.sleep(0.5)
+        # 可能会弹出 图形拖动型验证码
+        while "index" in self.driver.current_url:
+            time.sleep(1)
+        current_url = self.driver.current_url
+        # 弹出手机验证码输入框 网站未自动发出验证码
+        if "once_verification" in current_url:
+            change_verify_way_el = WebDriverWait(self.driver, 10).until(EC.visibility_of_element_located((By.CLASS_NAME, "detail_small")))
+            change_verify_way_el.find_element_by_tag_name("span").click()
+            list_contents = WebDriverWait(self.driver, 10).until(EC.visibility_of_all_elements_located((By.CLASS_NAME, "list_content")))
+            list_contents[1].click()
+        # 弹出邮箱验证码输入框 网站已自动发出验证码
         if "verification" in self.driver.current_url:
-            email_code_div = WebDriverWait(self.driver, 10).until(
-                EC.visibility_of_element_located((By.CLASS_NAME, "emailcode")))
+            email_code_div = WebDriverWait(self.driver, 10).until(EC.visibility_of_element_located((By.CLASS_NAME, "emailcode")))
             email_code_input = email_code_div.find_element_by_tag_name("input")
             email_code_input.send_keys(aliyun_email.loginAndGetCaptcha(self.driver, self.account_info[2], self.account_info[3], "OPPO", "验证码"))
             self.driver.find_element_by_class_name("primary_btn").click()

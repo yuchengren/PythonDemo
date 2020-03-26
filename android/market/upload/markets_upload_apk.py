@@ -14,7 +14,7 @@ from base.utils import FileUtils, TimeUtils
 
 """
 需要手动输入验证码的地方：
-oppo登录阿里云邮箱页面
+oppo登录页面、登录阿里云邮箱页面
 vivo登录页面
 huawei登录页面、登录阿里云邮箱页面
 """
@@ -22,27 +22,27 @@ huawei登录页面、登录阿里云邮箱页面
 
 # 应用市场脚本执行的行为类型
 class MarketActionType:
-    login = 1
-    goto_applist_page = 2
-    select_app = 3
-    upload = 4
+    login = 1  # 登录
+    goto_applist_page = 2  # 登录后跳转app列表页面
+    select_app = 3  # 跳转app列表页面后，选择需要更新的app
+    upload = 4  # 在选择的app更新页面，上传新apk
 
 
 # app类型
-app_name = AppName.penguin_shop_seller
+app_name = AppName.wudi_zhubo_seller
 # apk更新日志
 update_msg = "【优化】\n修复已知问题，优化用户体验\n更多细节优化，立即下载体验吧~"
 
 market_list = [
-    MarketChannel.xiaomi,
-    MarketChannel.oppo,
+    # MarketChannel.xiaomi,
+    # MarketChannel.oppo,
     MarketChannel.vivo,
-    MarketChannel.tencent,
-    MarketChannel.huawei,
+    # MarketChannel.tencent,
+    # MarketChannel.huawei,
 ]
 isAutoCommit = False  # 最后一步 是否自动提交 建议设为False 人为核对信息后 再手动点击提交
-isCheckChannelApkZipToday = True  # 是否校验渠道apk压缩包是否是今天的
-market_action_type = MarketActionType.goto_applist_page
+isCheckChannelApkZipToday = False  # 是否校验渠道apk压缩包是否是今天的
+market_action_type = MarketActionType.upload
 
 
 def unzipChannelApkZip():
