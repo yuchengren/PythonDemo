@@ -1,14 +1,9 @@
-import time
-
-from selenium import webdriver
 from selenium.webdriver.common.by import By
+from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.select import Select
 from selenium.webdriver.support.wait import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
 
-from android.market.config import market_urls, market_accounts, market_config
 from android.market.upload.IMarketUpload import IMarketUpload
-from android.market.upload.enums import AppName
 
 
 class XiaomiMarketUpload(IMarketUpload):
@@ -17,10 +12,10 @@ class XiaomiMarketUpload(IMarketUpload):
         super().__init__(market_channel, app_name, apk_dir_path)
 
     def login(self):
-        self.driver.get(market_urls.xiaomi_market_apps_page)
+        IMarketUpload.login(self)
         login_btn = WebDriverWait(self.driver, 10).until(EC.visibility_of_element_located((By.CLASS_NAME, "btnadpt")))
-        self.driver.find_element_by_id("username").send_keys(market_accounts.xiaomi_market_username)
-        self.driver.find_element_by_id("pwd").send_keys(market_accounts.xiaomi_market_password)
+        self.driver.find_element_by_id("username").send_keys(self.account_info[0])
+        self.driver.find_element_by_id("pwd").send_keys(self.account_info[1])
         login_btn.click()
 
     def select_app(self):

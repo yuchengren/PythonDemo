@@ -1,12 +1,9 @@
 import time
 
-from selenium.webdriver import ActionChains
 from selenium.webdriver.common.by import By
-from selenium.webdriver.common.keys import Keys
-from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.wait import WebDriverWait
 
-from android.market.config import market_urls, market_accounts
 from android.market.upload.IMarketUpload import IMarketUpload
 from android.market.upload.enums import AppName
 from base.email import aliyun_email
@@ -19,19 +16,18 @@ class HuaweiMarketUpload(IMarketUpload):
         super().__init__(market_channel, app_name, apk_dir_path)
         width = self.driver.execute_script("return window.screen.availWidth")
         height = self.driver.execute_script("return window.screen.availHeight")
-        print("width=%s, height=%s" % (width, height))
         # 华为市场 应用信息页面 左侧栏 如果浏览器宽度太小 则布局会自动收起左侧菜单栏，点击左箭头，左侧菜单才会弹出
         self.driver.set_window_size(width, height)
 
     def login(self):
-        self.driver.get(market_urls.huawei_market_apps_page)
+        IMarketUpload.login(self)
         username_input = WebDriverWait(self.driver, 10).until(EC.visibility_of_element_located((By.CLASS_NAME, "hwid-cover-input")))
         self.driver.execute_script("arguments[0].value='';", username_input)
-        username_input.send_keys(market_accounts.huawei_market_username)
+        username_input.send_keys(self.account_info[0])
         password_div = WebDriverWait(self.driver, 10).until(EC.visibility_of_element_located((By.CLASS_NAME, "hwid-password-root")))
         password_input = password_div.find_element_by_class_name("hwid-input")
         self.driver.execute_script("arguments[0].value='';", password_input)
-        password_input.send_keys(market_accounts.huawei_market_password)
+        password_input.send_keys(self.account_info[1])
         time.sleep(0.2)  # 给予 登录按钮 刷新 为可点击状态的缓冲时间
         login_btn = self.driver.find_element_by_class_name("hwid-login-btn")
         login_btn.click()
@@ -45,10 +41,7 @@ class HuaweiMarketUpload(IMarketUpload):
             WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable((By.CLASS_NAME, "userAccount"))).click()
             # 点击 获取验证码
             WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable((By.CLASS_NAME, "hwid-smsCode"))).click()
-            captcha_text = aliyun_email.loginAndGetCaptcha(self.driver,
-                                            market_accounts.huawei_market_username,
-                                            "MK@123456",
-                                            "华为", "验证码输入框")
+            captcha_text = aliyun_email.loginAndGetCaptcha(self.driver, self.account_info[2], self.account_info[3], "华为", "验证码输入框")
             captcha_input = self.driver.find_element_by_class_name("hwid-getAuthCode-input").find_element_by_class_name("hwid-input")
             captcha_input.send_keys(captcha_text)
             confirm_btn = WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable((By.CLASS_NAME, "btn-next")))

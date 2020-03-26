@@ -1,10 +1,9 @@
 import time
 
 from selenium.webdriver.common.by import By
-from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.wait import WebDriverWait
 
-from android.market.config import market_urls, market_accounts
 from android.market.upload.IMarketUpload import IMarketUpload
 from base.email import aliyun_email
 
@@ -15,15 +14,15 @@ class OppoMarketUpload(IMarketUpload):
         super().__init__(market_channel, app_name, apk_dir_path)
 
     def login(self):
-        self.driver.get(market_urls.oppo_market_apps_page)
+        IMarketUpload.login(self)
         login_way = WebDriverWait(self.driver, 10).until(
             EC.visibility_of_element_located((By.CLASS_NAME, "tabloginway")))
         login_way.find_elements_by_tag_name("p")[1].click()  # 密码登录
         username_input = self.driver.find_element_by_class_name("account").find_element_by_tag_name("input")
         self.driver.execute_script("arguments[0].value='';", username_input)
-        username_input.send_keys(market_accounts.oppo_market_username)
+        username_input.send_keys(self.account_info[0])
         password_div = WebDriverWait(self.driver, 10).until(EC.visibility_of_element_located((By.CLASS_NAME, "password")))
-        password_div.find_element_by_tag_name("input").send_keys(market_accounts.oppo_market_password)
+        password_div.find_element_by_tag_name("input").send_keys(self.account_info[1])
         login_btn = self.driver.find_element_by_class_name("passlogin").find_element_by_class_name("primary_btn")
         login_btn.click()
         time.sleep(0.5)
@@ -31,10 +30,7 @@ class OppoMarketUpload(IMarketUpload):
             email_code_div = WebDriverWait(self.driver, 10).until(
                 EC.visibility_of_element_located((By.CLASS_NAME, "emailcode")))
             email_code_input = email_code_div.find_element_by_tag_name("input")
-            email_code_input.send_keys(aliyun_email.loginAndGetCaptcha(self.driver,
-                                                                       market_accounts.oppo_market_username,
-                                                                       market_accounts.oppo_market_password,
-                                                                       "OPPO", "验证码"))
+            email_code_input.send_keys(aliyun_email.loginAndGetCaptcha(self.driver, self.account_info[2], self.account_info[3], "OPPO", "验证码"))
             self.driver.find_element_by_class_name("primary_btn").click()
 
     def select_app(self):

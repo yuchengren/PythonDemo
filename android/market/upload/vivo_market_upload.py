@@ -4,10 +4,9 @@ from selenium import webdriver
 from selenium.webdriver.chrome.webdriver import WebDriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
-from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.wait import WebDriverWait
 
-from android.market.config import market_urls, market_accounts
 from android.market.upload.IMarketUpload import IMarketUpload
 from android.market.upload.enums import AppName
 from base.selenium import ElementUtils
@@ -19,12 +18,12 @@ class VivoMarketUpload(IMarketUpload):
         super().__init__(market_channel, app_name, apk_dir_path)
 
     def login(self):
-        self.driver.get(market_urls.vivo_market_apps_page)
+        IMarketUpload.login(self)
         username_input = WebDriverWait(self.driver, 10).until(EC.visibility_of_element_located((By.NAME, "name")))
-        username_input.send_keys(market_accounts.vivo_market_username)
+        username_input.send_keys(self.account_info[0])
         login_btn = self.driver.find_element_by_class_name("btn-event")
         while login_btn is not None:
-            login_btn = self.input_password_and_captcha(self.driver, market_accounts.vivo_market_password)
+            login_btn = self.input_password_and_captcha(self.driver, self.account_info[1])
 
     @staticmethod
     def input_password_and_captcha(_driver: WebDriver, password):
@@ -45,7 +44,7 @@ class VivoMarketUpload(IMarketUpload):
             login_btn = ElementUtils.findElement(_driver, By.CLASS_NAME, "btn-event")
         return login_btn
 
-    def select_app(self):
+    def goto_app_list_page(self):
         # 管理中心按钮
         WebDriverWait(self.driver, 10).until(EC.visibility_of_element_located((By.CLASS_NAME, "manage-warp"))).click()
         time.sleep(0.2)
@@ -55,8 +54,11 @@ class VivoMarketUpload(IMarketUpload):
                 Keys.ESCAPE).perform()  # 管理中心的通知弹窗 esc 等效于关闭按钮(class="el-button")
             WebDriverWait(self.driver, 10).until_not(
                 EC.visibility_of_element_located((By.CLASS_NAME, "el-dialog--center")))
-        app_and_game = WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable((By.XPATH, '//*[@id="page-template"]/div[2]/div[3]/ul/li[1]')))
+        app_and_game = WebDriverWait(self.driver, 10).until(
+            EC.element_to_be_clickable((By.XPATH, '//*[@id="page-template"]/div[2]/div[3]/ul/li[1]')))
         self.driver.execute_script("arguments[0].click();", app_and_game)
+
+    def select_app(self):
         app_list = WebDriverWait(self.driver, 10).until(EC.visibility_of_element_located((By.CLASS_NAME, "el-table__body-wrapper")))
         app_rows = app_list.find_elements_by_class_name("el-table__row")
         for row in app_rows:

@@ -1,13 +1,11 @@
 import time
 
 from selenium.webdriver.common.by import By
-from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.wait import WebDriverWait
 
-from android.market.config import market_urls, market_accounts
 from android.market.upload.IMarketUpload import IMarketUpload
 from android.market.upload.enums import AppName
-from base.email import aliyun_email
 from base.selenium import ElementUtils
 
 
@@ -17,30 +15,31 @@ class TencentMarketUpload(IMarketUpload):
         super().__init__(market_channel, app_name, apk_dir_path)
 
     def login(self):
-        self.driver.get(market_urls.tencent_market_apps_page)
+        IMarketUpload.login(self)
         login_iframe = WebDriverWait(self.driver, 10).until(EC.visibility_of_element_located((By.ID, "login_frame")))
         self.driver.switch_to.frame(login_iframe)
         login_by_account = WebDriverWait(self.driver, 10).until(EC.visibility_of_element_located((By.ID, "switcher_plogin")))
         login_by_account.click()  # 账号密码登录
         username_input = WebDriverWait(self.driver, 10).until(EC.visibility_of_element_located((By.ID, "u")))
         self.driver.execute_script("arguments[0].value='';", username_input)
-        username_input.send_keys(market_accounts.tencent_market_username)
+        username_input.send_keys(self.account_info[0])
         password_input = WebDriverWait(self.driver, 10).until(EC.visibility_of_element_located((By.ID, "p")))
         self.driver.execute_script("arguments[0].value='';", password_input)
-        password_input.send_keys(market_accounts.tencent_market_password)
+        password_input.send_keys(self.account_info[1])
         self.driver.find_element_by_id("login_button").click()
         WebDriverWait(self.driver, 10).until(EC.visibility_of_element_located((By.ID, "loading_tips")))
         WebDriverWait(self.driver, 10).until_not(EC.visibility_of_element_located((By.ID, "loading_tips")))
         time.sleep(0.2)
 
-    def select_app(self):
-        app_list_table = WebDriverWait(self.driver, 10).until(EC.visibility_of_element_located((By.CLASS_NAME, "table-app-list")))
+    def goto_app_list_page(self):
         WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable((By.CLASS_NAME, "update-apk")))
         guide = ElementUtils.findElement(self.driver, By.ID, "j-guide-box")
         if guide is not None:
             guide.click()
             WebDriverWait(self.driver, 10).until_not(EC.visibility_of_element_located((By.ID, "j-guide-box")))
 
+    def select_app(self):
+        app_list_table = WebDriverWait(self.driver, 10).until(EC.visibility_of_element_located((By.CLASS_NAME, "table-app-list")))
         rows = app_list_table.find_element_by_tag_name("tbody").find_elements_by_tag_name("tr")
         for row in rows:
             name = row.find_element_by_class_name("app-name").text.strip()

@@ -3,8 +3,6 @@ import threading
 import traceback
 import zipfile
 
-from selenium.webdriver.chrome.webdriver import WebDriver
-
 from android.market.config import market_config
 from android.market.upload.enums import MarketChannel, AppName
 from android.market.upload.huawei_market_upload import HuaweiMarketUpload
@@ -14,20 +12,37 @@ from android.market.upload.vivo_market_upload import VivoMarketUpload
 from android.market.upload.xiaomi_market_upload import XiaomiMarketUpload
 from base.utils import FileUtils, TimeUtils
 
+"""
+需要手动输入验证码的地方：
+oppo登录阿里云邮箱页面
+vivo登录页面
+huawei登录页面、登录阿里云邮箱页面
+"""
+
+
+# 应用市场脚本执行的行为类型
+class MarketActionType:
+    login = 1
+    goto_applist_page = 2
+    select_app = 3
+    upload = 4
+
+
 # app类型
 app_name = AppName.penguin_shop_seller
 # apk更新日志
 update_msg = "【优化】\n修复已知问题，优化用户体验\n更多细节优化，立即下载体验吧~"
 
 market_list = [
-    # MarketChannel.xiaomi,
-    # MarketChannel.oppo,
-    # MarketChannel.vivo,
+    MarketChannel.xiaomi,
+    MarketChannel.oppo,
+    MarketChannel.vivo,
     MarketChannel.tencent,
-    # MarketChannel.huawei,
+    MarketChannel.huawei,
 ]
 isAutoCommit = False  # 最后一步 是否自动提交 建议设为False 人为核对信息后 再手动点击提交
 isCheckChannelApkZipToday = True  # 是否校验渠道apk压缩包是否是今天的
+market_action_type = MarketActionType.goto_applist_page
 
 
 def unzipChannelApkZip():
@@ -52,7 +67,7 @@ def unzipChannelApkZip():
     return apkDirPath
 
 
-def upload(_app_name, market_channel, _apk_dir_path):
+def get_market_upload_obj(market_channel, _app_name, _apk_dir_path):
     marketUploadObj = None
     if market_channel == MarketChannel.xiaomi:
         marketUploadObj = XiaomiMarketUpload(market_channel, _app_name, apk_dir_path)
@@ -64,26 +79,39 @@ def upload(_app_name, market_channel, _apk_dir_path):
         marketUploadObj = TencentMarketUpload(market_channel, _app_name, apk_dir_path)
     elif market_channel == MarketChannel.huawei:
         marketUploadObj = HuaweiMarketUpload(market_channel, _app_name, apk_dir_path)
+    return marketUploadObj
+
+
+def execute(market_channel, _app_name, _apk_dir_path):
+    apk_file = ""
+    marketUploadObj = get_market_upload_obj(market_channel, _app_name, _apk_dir_path)
     if marketUploadObj is None:
         return
-    marketUploadObj.login()
-    marketUploadObj.select_app()
-    apk_file = marketUploadObj.findMarketApkFile(_apk_dir_path)
-    if len(apk_file) == 0:
-        raise Exception("_app_name = %s market_channel = %s, cannot find the apk file in %s" %
-                        (_app_name, market_channel, _apk_dir_path))
-    marketUploadObj.upload(apk_file, update_msg, isAutoCommit)
-    print("upload end,_app_type = %s, market_channel = %s, apk_file = %s" %
+    if market_action_type >= MarketActionType.login:
+        marketUploadObj.login()
+    if market_action_type >= MarketActionType.goto_applist_page:
+        marketUploadObj.goto_app_list_page()
+    if market_action_type >= MarketActionType.select_app:
+        marketUploadObj.select_app()
+    if market_action_type >= MarketActionType.upload:
+        apk_file = marketUploadObj.findMarketApkFile(_apk_dir_path)
+        if len(apk_file) == 0:
+            raise Exception("_app_name = %s market_channel = %s, cannot find the apk file in %s" %
+                            (_app_name, market_channel, _apk_dir_path))
+        marketUploadObj.upload(apk_file, update_msg, isAutoCommit)
+    print("driver execute end,_app_type = %s, market_channel = %s, apk_file = %s" %
           (_app_name, market_channel, apk_file))
 
 
-apk_dir_path = unzipChannelApkZip()
-if len(apk_dir_path) == 0:
-    raise Exception("can not find apk zip and do unzip")
+apk_dir_path = ""
+if market_action_type >= MarketActionType.upload:
+    apk_dir_path = unzipChannelApkZip()
+    if len(apk_dir_path) == 0:
+        raise Exception("can not find apk zip and do unzip")
 thread_list = []
 for market in market_list:
     try:
-        thread = threading.Thread(target=upload, args=(app_name, market, apk_dir_path))
+        thread = threading.Thread(target=execute, args=(market, app_name, apk_dir_path))
         thread.start()
         thread_list.append(thread)
     except Exception as e:
