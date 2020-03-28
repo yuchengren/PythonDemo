@@ -43,7 +43,7 @@ def login(driver: WebDriver):
 
     print((verifyCodeImgLeft, verifyCodeImgTop, verifyCodeImgRight, verifyCodeImgBottom))
     # 登录页面全屏截图
-    driver.get_screenshot_as_file(imgFilePath)
+    # driver.get_screenshot_as_file(imgFilePath)
     # 从全屏截图 截取验证码区域
     verifyCodeImg = Image.open(imgFilePath).crop((verifyCodeImgLeft * devicePixelRatio,
                                                   verifyCodeImgTop * devicePixelRatio,
@@ -52,8 +52,8 @@ def login(driver: WebDriver):
     verifyCodeImg = verifyCodeImg.convert('L')  # 转换模式 L|RGB
     verifyCodeImg = ImageEnhance.Contrast(verifyCodeImg)  # 增强对比度
     verifyCodeImg = verifyCodeImg.enhance(2.0)  # 增加饱和度
-    verifyCodeImg.save(imgFilePath)
-    time.sleep(0.5)
+    # verifyCodeImg.save(imgFilePath)
+    # time.sleep(0.5)
     verifyCode = ""
     print("verifyCode = %s" % verifyCode)
 

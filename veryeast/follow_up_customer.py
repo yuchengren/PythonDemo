@@ -25,7 +25,7 @@ third_menu_index = ConditionEnums.PersonalConsoleChildMenu.my_customer.value
 maxEachDayFollowUpNumber = 55
 conditionNextFollowUpIntervalDay = 14  # 下次跟进开始日期和结束日期的间隔天数
 maxFollowUpForwardDays = 5  # 跟进客户日期推前的最大天数
-follow_up_first_day_interval_today = 1
+follow_up_first_day_interval_today = 1  # 将要跟进客户的日期距离今天的天数
 # 浏览器
 options = webdriver.ChromeOptions()
 driver = webdriver.Chrome(options=options)
@@ -105,10 +105,8 @@ print(canAddFollowUpDayDict)
 
 #  获取跟进日期在今天以前的数据列表
 resetNextFollowUpTimesAndSearchAgain("", nextFollowUpEndDay)
-listElement = WebDriverWait(driver, 10).until(EC.visibility_of_element_located((By.CLASS_NAME, "ant-table-tbody")))
-listRows = listElement.find_elements_by_class_name("ant-table-row")
-nextPageElement = None
 
+nextPageElement = None
 while nextPageElement is None or nextPageElement.get_attribute("aria-disabled") == "false":
     if nextPageElement is not None:
         if nextPageElement.get_attribute("aria-disabled") == "false":
@@ -117,7 +115,7 @@ while nextPageElement is None or nextPageElement.get_attribute("aria-disabled") 
             os._exit(1)
     WebDriverWait(driver, 10).until_not(
         EC.visibility_of_element_located((By.CLASS_NAME, "ant-table-spin-holder")))
-    time.sleep(0.5)
+    time.sleep(2)
     listElement = WebDriverWait(driver, 10).until(EC.visibility_of_element_located((By.CLASS_NAME, "ant-table-tbody")))
 
     listRows = listElement.find_elements_by_class_name("ant-table-row")
@@ -164,12 +162,11 @@ while nextPageElement is None or nextPageElement.get_attribute("aria-disabled") 
         nextFollowUpDateElement.send_keys(Keys.ENTER)
 
         driver.find_element_by_class_name("ant-btn-primary").click()
-        time.sleep(0.2)
-        # driver.close()
+        WebDriverWait(driver, 10).until_not(EC.visibility_of_element_located((By.ID, "dRadioText-101")))
         canAddFollowUpDayDict[currentAllocateDate] = canAddFollowUpDayDict[currentAllocateDate] + 1
         driver.switch_to.window(mainWindow)
-        iframe = WebDriverWait(driver, 10).until(
-            EC.visibility_of_element_located((By.TAG_NAME, "iframe")))  # 我的公海iframe区域
+        # 我的公海iframe区域
+        iframe = WebDriverWait(driver, 10).until(EC.visibility_of_element_located((By.TAG_NAME, "iframe")))
         driver.switch_to.frame(iframe)
 
     # 点击下一页
