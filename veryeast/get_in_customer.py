@@ -8,11 +8,14 @@ import threading
 import traceback
 
 from selenium import webdriver
+from selenium.webdriver import ActionChains
+from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
 import time
 
+from base.selenium import CookieUtils
 from veryeast.enum import ConditionEnums
 from veryeast.common import bg_system_login
 from veryeast.common import select_three_menus
@@ -39,8 +42,8 @@ def get_in_customer(customer_index):
     # 所属公海筛选-VE营销中心公海
     WebDriverWait(driver, 10).until(EC.visibility_of_element_located((By.CLASS_NAME, "_1VePUHA")))  # 筛选条件区域
     # loading蒙层不可见后,待数据列表区域可见
-    # WebDriverWait(driver, 10).until_not(EC.visibility_of_element_located((By.CLASS_NAME, "ant-spin-blur")))
-
+    WebDriverWait(driver, 10).until_not(EC.visibility_of_element_located((By.CLASS_NAME, "ant-spin-blur")))
+    print("cookies = %s" % CookieUtils.getCookies(driver))
     belongPublicSeaElement = driver.find_element_by_xpath(
         '//*[@id="root"]/div/section/section/section/main/div/div/div/div/div[1]/div[2]/div[3]/div[2]/div/div')
     belongPublicSeaElement.click()
@@ -85,15 +88,11 @@ def get_in_customer(customer_index):
     driver.switch_to.window(all_windows[len(all_windows) - 1])
     get_in_btn = WebDriverWait(driver, 10).until(EC.element_to_be_clickable(
         (By.XPATH, '//*[@id="root"]/div/section/section/section/main/div/div/div/div/div/div[1]/div[2]/button[4]')))
+    get_in_btn.click()
+    WebDriverWait(driver, 10, 0.02).until(EC.element_to_be_clickable((By.CLASS_NAME, "ant-btn-primary")))
     while True:
-        # 如果直接调用click, 可能会报selenium.common.exceptions.ElementClickInterceptedException
-        driver.execute_script("arguments[0].click();", get_in_btn)
-        dialog_btn_sure = WebDriverWait(driver, 10, 0.02).until(
-            EC.presence_of_element_located((By.CLASS_NAME, "ant-btn-primary")))
-        driver.execute_script("arguments[0].click();", dialog_btn_sure)
-        WebDriverWait(driver, 10, 0.02).until_not(
-            EC.presence_of_element_located((By.CLASS_NAME, "ant-btn-primary")))
-
+        ActionChains(driver).send_keys(Keys.ENTER).perform()
+        time.sleep(0.05)
 
 customer_size = 1  # 可揽入客户的数量
 thread_list = []
@@ -110,26 +109,6 @@ for t in thread_list:
     t.join()  # 线程A中使用B.join()表示线程A在调用join()处被阻塞，且要等待线程B的完成才能继续执行
 
 os._exit(1)  # 防止程序执行完后，浏览器被自动关闭
-
-
-
-def checkAndGetInCustomer(driver):
-    # 勾选搜索结果项
-    WebDriverWait(driver, 10).until(EC.visibility_of_all_elements_located((By.CLASS_NAME, "ant-table-row")))
-    tableRows = driver.find_elements_by_class_name("ant-table-row")
-    for index, tableRow in enumerate(tableRows):
-        if tableRow.find_element_by_tag_name("a").text in except_customer_name:
-            continue
-        tableRow.find_element_by_class_name("ant-checkbox-input").click()
-
-    # 点击揽入
-    driver.find_element_by_class_name("j60bgz6").find_elements_by_class_name("ant-btn")[1].click()
-    getInDialog = WebDriverWait(driver, 5).until(EC.visibility_of_element_located((By.CLASS_NAME, "ant-modal-content")))
-    getInDialog.find_element_by_class_name("ant-btn-primary").click()  # 确定按钮
-
-
-# while True:
-#     checkAndGetInCustomer(driver)
 
 
 

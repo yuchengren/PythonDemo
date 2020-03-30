@@ -1,10 +1,13 @@
+from selenium import webdriver
 from selenium.common.exceptions import NoSuchElementException
 import time
 
-from selenium.webdriver.chrome.webdriver import WebDriver
+
 from selenium.webdriver.common.by import By
+from selenium.webdriver.remote.webdriver import WebDriver
 
 import veryeast.config.veryeast_info
+from base.selenium import CookieUtils
 from veryeast.config import veryeast_config
 from PIL import Image, ImageEnhance
 from selenium.webdriver.support.ui import WebDriverWait
@@ -95,4 +98,18 @@ def login(driver: WebDriver):
 
     # 进入主页面后
     WebDriverWait(driver, 5).until(EC.presence_of_element_located((By.CLASS_NAME, "sider___g53Yu")))
+    print("cookies = %s" % CookieUtils.getCookies(driver))
 
+    print("sessionId01= %s" % driver.get_cookie("JSESSIONID"))
+    sessionid = driver.execute_script('return sessionStorage.getItem("JSESSIONID");')
+    print("sessionId02= %s" % sessionid)
+
+    print("sessionId03= %s" % driver.get_cookie("sessionId"))
+    sessionid = driver.execute_script('return sessionStorage.getItem("sessionId");')
+    print("sessionId04= %s" % sessionid)
+
+    print("sessionId05= %s" % driver.session_id)
+
+
+if __name__ == '__main__':
+    login(webdriver.Firefox())

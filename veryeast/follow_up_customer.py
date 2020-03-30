@@ -28,7 +28,7 @@ maxFollowUpForwardDays = 5  # 跟进客户日期推前的最大天数
 follow_up_first_day_interval_today = 1  # 将要跟进客户的日期距离今天的天数
 # 浏览器
 options = webdriver.ChromeOptions()
-driver = webdriver.Chrome(options=options)
+driver = webdriver.Chrome(executable_path="chromedriver", options=options)
 bg_system_login.login(driver)
 select_three_menus.select(driver, first_menu_index, second_menu_index, third_menu_index)
 
