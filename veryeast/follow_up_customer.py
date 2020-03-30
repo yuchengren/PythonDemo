@@ -12,6 +12,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
 import datetime
 
+from base.selenium import ElementUtils
 from veryeast.enum import ConditionEnums
 from veryeast.common import bg_system_login
 from veryeast.common import select_three_menus
@@ -79,8 +80,11 @@ def resetNextFollowUpTimesAndSearchAgain(start_time, end_time):
 def getListTotalNumber():
     WebDriverWait(driver, 10).until_not(
         EC.visibility_of_element_located((By.CLASS_NAME, "ant-table-spin-holder")))
-    totalElement = WebDriverWait(driver, 10).until(
-        EC.visibility_of_element_located((By.CLASS_NAME, "ant-pagination-total-text")))
+    time.sleep(0.2)
+    totalElement = ElementUtils.findElement(driver, By.CLASS_NAME, "ant-pagination-total-text")
+    if totalElement is None:
+        return 0
+    # totalElement = WebDriverWait(driver, 10).until(EC.visibility_of_element_located((By.CLASS_NAME, "ant-pagination-total-text")))
     return int(totalElement.text.split("共")[1].split("条")[0].strip())
 
 
@@ -115,7 +119,7 @@ while nextPageElement is None or nextPageElement.get_attribute("aria-disabled") 
             os._exit(1)
     WebDriverWait(driver, 10).until_not(
         EC.visibility_of_element_located((By.CLASS_NAME, "ant-table-spin-holder")))
-    time.sleep(2)
+    time.sleep(1)
     listElement = WebDriverWait(driver, 10).until(EC.visibility_of_element_located((By.CLASS_NAME, "ant-table-tbody")))
 
     listRows = listElement.find_elements_by_class_name("ant-table-row")
@@ -162,7 +166,8 @@ while nextPageElement is None or nextPageElement.get_attribute("aria-disabled") 
         nextFollowUpDateElement.send_keys(Keys.ENTER)
 
         driver.find_element_by_class_name("ant-btn-primary").click()
-        WebDriverWait(driver, 10).until_not(EC.visibility_of_element_located((By.ID, "dRadioText-101")))
+        time.sleep(0.2)
+        # WebDriverWait(driver, 10).until_not(EC.visibility_of_element_located((By.ID, "dRadioText-101")))
         canAddFollowUpDayDict[currentAllocateDate] = canAddFollowUpDayDict[currentAllocateDate] + 1
         driver.switch_to.window(mainWindow)
         # 我的公海iframe区域
