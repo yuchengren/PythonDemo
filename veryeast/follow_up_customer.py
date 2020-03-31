@@ -71,8 +71,7 @@ def resetNextFollowUpTimesAndSearchAgain(start_time, end_time):
     followUpInput = driver.find_element_by_class_name("ant-calendar-input")
     driver.execute_script("arguments[0].value='';", followUpInput)
     followUpInput.send_keys(end_time)
-    searchBtn = driver.find_elements_by_class_name("_2-cVhQR")[0]
-    searchBtn.click()
+    driver.find_elements_by_class_name("_2-cVhQR")[0].click()  # 搜索
     WebDriverWait(driver, 10).until_not(
         EC.visibility_of_element_located((By.CLASS_NAME, "ant-table-spin-holder")))
 
@@ -96,6 +95,8 @@ def getPageCount():
     return int(totalElement.text.split("条/页")[0].strip())
 
 
+WebDriverWait(driver, 5).until(EC.presence_of_element_located((By.CLASS_NAME, "ant-calendar-picker-icon")))
+WebDriverWait(driver, 5).until(EC.presence_of_element_located((By.CLASS_NAME, "ant-calendar-picker-input")))
 # 获取跟进日期在今天以前的数据量
 resetNextFollowUpTimesAndSearchAgain("", nextFollowUpEndDay)
 waitFollowUpTotalNumber = getListTotalNumber()
@@ -116,6 +117,7 @@ while nextPageElement is None or nextPageElement.get_attribute("aria-disabled") 
         if nextPageElement.get_attribute("aria-disabled") == "false":
             nextPageElement.click()
         else:
+            driver.find_elements_by_class_name("_2-cVhQR")[0].click()
             os._exit(1)
     WebDriverWait(driver, 10).until_not(
         EC.visibility_of_element_located((By.CLASS_NAME, "ant-table-spin-holder")))
