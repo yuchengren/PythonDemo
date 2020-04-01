@@ -75,7 +75,9 @@ class HuaweiMarketUpload(IMarketUpload):
         version_info_second_child_tab = ElementUtils.findElement(self.driver, By.ID, "974583343109141981")
         version_update_btn = WebDriverWait(self.driver, 10).until(EC.presence_of_all_elements_located((By.ID, "VersionButton")))[1]
         if version_info_second_child_tab is None:
-            version_update_btn.click()  # 跳转到 新版本 准备提交的tab页面
+            print()
+            version_update_btn.click()  # 跳转到 【新版本 准备提交】的tab页面，会有缓冲
+            time.sleep(1)
             app_info.click()  # 点击应用信息 去修改更新文案
         # 应用信息-更新 新版本特性
         time.sleep(1)

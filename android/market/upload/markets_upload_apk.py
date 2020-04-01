@@ -29,7 +29,7 @@ class MarketActionType:
 
 
 # app类型
-app_name = AppName.wudi_zhubo_seller
+app_name = AppName.mockuai_star_buyer
 # apk更新日志
 update_msg = "【优化】\n修复已知问题，优化用户体验\n更多细节优化，立即下载体验吧~"
 
@@ -37,12 +37,12 @@ market_list = [
     # MarketChannel.xiaomi,
     # MarketChannel.oppo,
     # MarketChannel.vivo,
-    MarketChannel.tencent,
-    # MarketChannel.huawei,
+    # MarketChannel.tencent,
+    MarketChannel.huawei,
 ]
 isAutoCommit = False  # 最后一步 是否自动提交 建议设为False 人为核对信息后 再手动点击提交
-isCheckChannelApkZipToday = False  # 是否校验渠道apk压缩包是否是今天的
-market_action_type = MarketActionType.goto_applist_page
+isCheckChannelApkZipToday = True  # 是否校验渠道apk压缩包是否是今天的
+market_action_type = MarketActionType.upload
 
 
 def unzipChannelApkZip():
