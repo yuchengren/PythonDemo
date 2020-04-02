@@ -27,6 +27,8 @@ maxEachDayFollowUpNumber = 55
 conditionNextFollowUpIntervalDay = 14  # 下次跟进开始日期和结束日期的间隔天数
 maxFollowUpForwardDays = 5  # 跟进客户日期推前的最大天数
 follow_up_first_day_interval_today = 1  # 将要跟进客户的日期距离今天的天数
+can_not_follow_up_days = ["2020-05-01", "2020-05-04", "2020-05-05"]
+
 # 浏览器
 options = webdriver.ChromeOptions()
 driver = webdriver.Chrome(executable_path="chromedriver", options=options)
@@ -41,7 +43,8 @@ canAddFollowUpDayList = []
 canAddFollowUpDayDict = {}
 canAddFollowUpDay = today + datetime.timedelta(days=follow_up_first_day_interval_today)
 while len(canAddFollowUpDayList) < maxFollowUpForwardDays:
-    if TimeUtils.isWeekday(canAddFollowUpDay):
+    canAddFollowUpDayStr = TimeUtils.formatToDayStr(canAddFollowUpDay)
+    if TimeUtils.isWeekday(canAddFollowUpDay) and canAddFollowUpDayStr not in can_not_follow_up_days:
         canAddFollowUpDayList.append(TimeUtils.formatToDayStr(canAddFollowUpDay))
     canAddFollowUpDay = canAddFollowUpDay + datetime.timedelta(days=1)
 print(canAddFollowUpDayList)
@@ -114,29 +117,19 @@ resetNextFollowUpTimesAndSearchAgain("", nextFollowUpEndDay)
 nextPageElement = None
 while nextPageElement is None or nextPageElement.get_attribute("aria-disabled") == "false":
     if nextPageElement is not None:
-        if nextPageElement.get_attribute("aria-disabled") == "false":
-            nextPageElement.click()
-        else:
-            driver.find_elements_by_class_name("_2-cVhQR")[0].click()
-            os._exit(1)
-    WebDriverWait(driver, 10).until_not(
-        EC.visibility_of_element_located((By.CLASS_NAME, "ant-table-spin-holder")))
-    time.sleep(1)
+        nextPageElement.click()
+        WebDriverWait(driver, 10).until(EC.visibility_of_element_located((By.CLASS_NAME, "ant-table-spin-holder")))
     listElement = WebDriverWait(driver, 10).until(EC.visibility_of_element_located((By.CLASS_NAME, "ant-table-tbody")))
-
+    WebDriverWait(driver, 10).until(EC.visibility_of_all_elements_located((By.CLASS_NAME, "ant-table-row")))
     listRows = listElement.find_elements_by_class_name("ant-table-row")
     # 当前页客户的跟进
     for index, row in enumerate(listRows):
         row.find_elements_by_tag_name("td")[11].find_element_by_tag_name("a").click()  # 点击跟进客户
         all_windows = driver.window_handles
         driver.switch_to.window(all_windows[len(all_windows) - 1])
-        # for window in all_windows:
-        #     if window != mainWindow:
-        #         driver.switch_to.window(window)
-        #         break
         WebDriverWait(driver, 10).until(EC.visibility_of_element_located((By.ID, "dRadioText-101")))
-        driver.find_element_by_id("dRadioText-101").find_elements_by_class_name("ant-radio-input")[
-            1].click()  # 是否纯粹安排 点击是
+        # 是否纯粹安排 点击是
+        driver.find_element_by_id("dRadioText-101").find_elements_by_class_name("ant-radio-input")[1].click()
         driver.find_element_by_class_name("ant-calendar-picker-input").click()
         nextFollowUpDatePop = WebDriverWait(driver, 10).until(
             EC.visibility_of_element_located((By.CLASS_NAME, "ant-calendar-picker-container-placement-bottomLeft")))
@@ -149,9 +142,8 @@ while nextPageElement is None or nextPageElement.get_attribute("aria-disabled") 
                 break
             else:
                 fullFollowUpDayCount += 1
-        if fullFollowUpDayCount == len(canAddFollowUpDayDict):
-            lastFollowUpDayStr = canAddFollowUpDayDict.keys()[len(canAddFollowUpDayDict.keys()) - 1]
-            lastFollowUpDay = TimeUtils.parseToDatetime(lastFollowUpDayStr)
+        while fullFollowUpDayCount == len(canAddFollowUpDayDict):
+            lastFollowUpDay = TimeUtils.parseToDatetime(currentAllocateDate)
             lastFollowUpDayWeekDay = lastFollowUpDay.weekday()
             needForwardDays = 1
             if lastFollowUpDayWeekDay == 4:
@@ -159,8 +151,9 @@ while nextPageElement is None or nextPageElement.get_attribute("aria-disabled") 
             elif lastFollowUpDayWeekDay == 5:
                 needForwardDays = 2
             currentAllocateDate = TimeUtils.formatToDayStr(TimeUtils.addDays(lastFollowUpDay, needForwardDays))
-            print("currentAllocateDate = %s" % currentAllocateDate)
-            canAddFollowUpDayDict[currentAllocateDate] = 0
+            if currentAllocateDate not in can_not_follow_up_days:
+                print("currentAllocateDate = %s" % currentAllocateDate)
+                canAddFollowUpDayDict[currentAllocateDate] = 0
 
         nextFollowUpDateElement = nextFollowUpDatePop.find_element_by_class_name("ant-calendar-input")
         driver.execute_script("arguments[0].value='';", nextFollowUpDateElement)
@@ -180,5 +173,7 @@ while nextPageElement is None or nextPageElement.get_attribute("aria-disabled") 
     nextPageElement = driver.find_element_by_class_name("ant-pagination-next")
 
 
-
+driver.find_elements_by_class_name("_2-cVhQR")[0].click()
+print("follow up over")
+os._exit(1)
 
