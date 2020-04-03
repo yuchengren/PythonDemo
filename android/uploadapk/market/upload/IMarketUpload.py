@@ -1,11 +1,9 @@
 import os
-import zipfile
 
 from selenium import webdriver
 
-from android.market.config import market_config, haoyina_config, mockuai_config, market_urls
-from android.market.upload.enums import AppName, MarketChannel
-from base.utils import TimeUtils, FileUtils
+from android.uploadapk.market.config import mockuai_config, haoyina_config, market_urls
+from android.uploadapk.market.upload.enums import AppName, MarketChannel
 
 
 class IMarketUpload:

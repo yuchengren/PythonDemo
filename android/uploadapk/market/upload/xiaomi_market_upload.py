@@ -3,7 +3,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.select import Select
 from selenium.webdriver.support.wait import WebDriverWait
 
-from android.market.upload.IMarketUpload import IMarketUpload
+from android.uploadapk.market.upload.IMarketUpload import IMarketUpload
 
 
 class XiaomiMarketUpload(IMarketUpload):

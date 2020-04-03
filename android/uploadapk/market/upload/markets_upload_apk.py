@@ -3,13 +3,13 @@ import threading
 import traceback
 import zipfile
 
-from android.market.config import market_config
-from android.market.upload.enums import MarketChannel, AppName
-from android.market.upload.huawei_market_upload import HuaweiMarketUpload
-from android.market.upload.oppo_market_upload import OppoMarketUpload
-from android.market.upload.tencent_market_upload import TencentMarketUpload
-from android.market.upload.vivo_market_upload import VivoMarketUpload
-from android.market.upload.xiaomi_market_upload import XiaomiMarketUpload
+from android.uploadapk.market.config import market_config
+from android.uploadapk.market.upload.enums import MarketChannel, AppName
+from android.uploadapk.market.upload.huawei_market_upload import HuaweiMarketUpload
+from android.uploadapk.market.upload.oppo_market_upload import OppoMarketUpload
+from android.uploadapk.market.upload.tencent_market_upload import TencentMarketUpload
+from android.uploadapk.market.upload.vivo_market_upload import VivoMarketUpload
+from android.uploadapk.market.upload.xiaomi_market_upload import XiaomiMarketUpload
 from base.utils import FileUtils, TimeUtils
 
 """
@@ -52,7 +52,9 @@ def unzipChannelApkZip():
         file_path = os.path.join(market_config.apk_zip_parent_path, f)
         base_name = os.path.basename(f)
         modify_time = os.path.getmtime(file_path)
-        if base_name == market_config.apk_zip_name and (TimeUtils.isToday(modify_time) or not isCheckChannelApkZipToday):
+        if base_name == market_config.apk_zip_name:
+            if not TimeUtils.isToday(modify_time) and isCheckChannelApkZipToday:
+                raise Exception("check channel apk zip is not today file")
             zip_files = zipfile.ZipFile(os.path.join(market_config.apk_zip_parent_path, f))
             apk_dir = os.path.join(market_config.apk_zip_parent_path, market_config.apk_dir_name)
             if os.path.exists(apk_dir):

@@ -7,7 +7,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
-import android.market.config.mockuai_config
+import android.uploadapk.market.config.mockuai_config
 from base.config import email_urls
 from base.selenium import ElementUtils
 from base.utils import TimeUtils
@@ -113,5 +113,5 @@ def loginAndGetCaptcha(driver: WebDriver, username, password, title_filter, cont
 
 if __name__ == '__main__':
     driver = webdriver.Chrome()
-    loginAndGetCaptcha(driver, android.market.config.mockuai_config.oppo_market_username,
-                       android.market.config.mockuai_config.oppo_market_password, "OPPO", "验证码")
+    loginAndGetCaptcha(driver, android.uploadapk.market.config.mockuai_config.oppo_market_username,
+                       android.uploadapk.market.config.mockuai_config.oppo_market_password, "OPPO", "验证码")

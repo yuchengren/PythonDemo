@@ -4,8 +4,8 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.wait import WebDriverWait
 
-from android.market.upload.IMarketUpload import IMarketUpload
-from android.market.upload.enums import AppName
+from android.uploadapk.market.upload.IMarketUpload import IMarketUpload
+from android.uploadapk.market.upload.enums import AppName
 from base.email import aliyun_email
 from base.selenium import ElementUtils
 
