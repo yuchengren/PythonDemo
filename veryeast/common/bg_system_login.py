@@ -98,17 +98,7 @@ def login(driver: WebDriver):
 
     # 进入主页面后
     WebDriverWait(driver, 5).until(EC.presence_of_element_located((By.CLASS_NAME, "sider___g53Yu")))
-    print("cookies = %s" % CookieUtils.getCookies(driver))
-
-    print("sessionId01= %s" % driver.get_cookie("JSESSIONID"))
-    sessionid = driver.execute_script('return sessionStorage.getItem("JSESSIONID");')
-    print("sessionId02= %s" % sessionid)
-
-    print("sessionId03= %s" % driver.get_cookie("sessionId"))
-    sessionid = driver.execute_script('return sessionStorage.getItem("sessionId");')
-    print("sessionId04= %s" % sessionid)
-
-    print("sessionId05= %s" % driver.session_id)
+    print("cookiesStr = %s" % CookieUtils.getCookiesStr(driver))
 
 
 if __name__ == '__main__':

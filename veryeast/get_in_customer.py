@@ -43,7 +43,7 @@ def get_in_customer(customer_index):
     WebDriverWait(driver, 10).until(EC.visibility_of_element_located((By.CLASS_NAME, "_1VePUHA")))  # 筛选条件区域
     # loading蒙层不可见后,待数据列表区域可见
     WebDriverWait(driver, 10).until_not(EC.visibility_of_element_located((By.CLASS_NAME, "ant-spin-blur")))
-    print("cookies = %s" % CookieUtils.getCookies(driver))
+    print("cookies = %s" % CookieUtils.getCookiesStr(driver))
     belongPublicSeaElement = driver.find_element_by_xpath(
         '//*[@id="root"]/div/section/section/section/main/div/div/div/div/div[1]/div[2]/div[3]/div[2]/div/div')
     belongPublicSeaElement.click()

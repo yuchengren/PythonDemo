@@ -99,6 +99,8 @@ def get_customers_info(index):
 for index in range(len(tableRows)):
     get_customers_info(index)
 
+
+
 os._exit(1)
 
 

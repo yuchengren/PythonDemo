@@ -26,7 +26,7 @@ third_menu_index = ConditionEnums.PersonalConsoleChildMenu.my_customer.value
 maxEachDayFollowUpNumber = 55
 conditionNextFollowUpIntervalDay = 14  # 下次跟进开始日期和结束日期的间隔天数
 maxFollowUpForwardDays = 5  # 跟进客户日期推前的最大天数
-follow_up_first_day_interval_today = 1  # 将要跟进客户的日期距离今天的天数
+follow_up_first_day_interval_today = 4  # 将要跟进客户的日期距离今天的天数
 can_not_follow_up_days = ["2020-05-01", "2020-05-04", "2020-05-05"]
 
 # 浏览器
@@ -37,7 +37,7 @@ select_three_menus.select(driver, first_menu_index, second_menu_index, third_men
 
 today = datetime.datetime.now()
 nextFollowUpstartDay = TimeUtils.formatToDayStr(today + datetime.timedelta(days=-conditionNextFollowUpIntervalDay))
-nextFollowUpEndDay = TimeUtils.formatToDayStr(today)
+nextFollowUpEndDay = TimeUtils.formatToDayStr(today + datetime.timedelta(days=follow_up_first_day_interval_today - 1))
 
 canAddFollowUpDayList = []
 canAddFollowUpDayDict = {}
@@ -117,8 +117,9 @@ resetNextFollowUpTimesAndSearchAgain("", nextFollowUpEndDay)
 nextPageElement = None
 while nextPageElement is None or nextPageElement.get_attribute("aria-disabled") == "false":
     if nextPageElement is not None:
-        nextPageElement.click()
+        driver.execute_script("arguments[0].click();", nextPageElement)
         WebDriverWait(driver, 10).until(EC.visibility_of_element_located((By.CLASS_NAME, "ant-table-spin-holder")))
+    WebDriverWait(driver, 10).until_not(EC.visibility_of_element_located((By.CLASS_NAME, "ant-table-spin-holder")))
     listElement = WebDriverWait(driver, 10).until(EC.visibility_of_element_located((By.CLASS_NAME, "ant-table-tbody")))
     WebDriverWait(driver, 10).until(EC.visibility_of_all_elements_located((By.CLASS_NAME, "ant-table-row")))
     listRows = listElement.find_elements_by_class_name("ant-table-row")
