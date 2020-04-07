@@ -26,8 +26,10 @@ third_menu_index = ConditionEnums.PersonalConsoleChildMenu.my_customer.value
 maxEachDayFollowUpNumber = 55
 conditionNextFollowUpIntervalDay = 14  # 下次跟进开始日期和结束日期的间隔天数
 maxFollowUpForwardDays = 5  # 跟进客户日期推前的最大天数
-follow_up_first_day_interval_today = 4  # 将要跟进客户的日期距离今天的天数
-can_not_follow_up_days = ["2020-05-01", "2020-05-04", "2020-05-05"]
+follow_up_first_day_interval_today = 1  # 将要跟进客户的日期距离今天的天数
+can_not_follow_up_days = ["2020-05-01", "2020-05-04", "2020-05-05", "2020-06-25", "2020-06-26",
+                          "2020-10-01", "2020-10-02", "2020-10-05", "2020-10-06", "2020-10-07", "2020-10-08"]
+weekend_is_weekdays = ["2020-04-26", "2020-05-09", "2020-06-28", "2020-09-27", "2020-10-10"]
 
 # 浏览器
 options = webdriver.ChromeOptions()
@@ -39,12 +41,18 @@ today = datetime.datetime.now()
 nextFollowUpstartDay = TimeUtils.formatToDayStr(today + datetime.timedelta(days=-conditionNextFollowUpIntervalDay))
 nextFollowUpEndDay = TimeUtils.formatToDayStr(today + datetime.timedelta(days=follow_up_first_day_interval_today - 1))
 
+
+def isDayCanFollowUp(day):
+    _canAddFollowUpDayStr = TimeUtils.formatToDayStr(canAddFollowUpDay)
+    return TimeUtils.isWeekday(day) and _canAddFollowUpDayStr not in can_not_follow_up_days or \
+           TimeUtils.isWeekend(day) and _canAddFollowUpDayStr in weekend_is_weekdays
+
+
 canAddFollowUpDayList = []
 canAddFollowUpDayDict = {}
 canAddFollowUpDay = today + datetime.timedelta(days=follow_up_first_day_interval_today)
 while len(canAddFollowUpDayList) < maxFollowUpForwardDays:
-    canAddFollowUpDayStr = TimeUtils.formatToDayStr(canAddFollowUpDay)
-    if TimeUtils.isWeekday(canAddFollowUpDay) and canAddFollowUpDayStr not in can_not_follow_up_days:
+    if isDayCanFollowUp(canAddFollowUpDay):
         canAddFollowUpDayList.append(TimeUtils.formatToDayStr(canAddFollowUpDay))
     canAddFollowUpDay = canAddFollowUpDay + datetime.timedelta(days=1)
 print(canAddFollowUpDayList)
@@ -67,7 +75,7 @@ def resetNextFollowUpTimesAndSearchAgain(start_time, end_time):
         followUpInput.send_keys(start_time)
 
     driver.find_elements_by_class_name("ant-calendar-picker-input")[1].click()
-    time.sleep(0.2)   # 防止上次的事件选择框还未消失
+    time.sleep(0.2)  # 防止上次的事件选择框还未消失
     WebDriverWait(driver, 5).until(EC.visibility_of_element_located(
         (By.CLASS_NAME, "ant-calendar-picker-container-placement-bottomLeft")))
     WebDriverWait(driver, 5).until(EC.element_to_be_clickable((By.CLASS_NAME, "ant-calendar-input")))
@@ -145,14 +153,8 @@ while nextPageElement is None or nextPageElement.get_attribute("aria-disabled") 
                 fullFollowUpDayCount += 1
         while fullFollowUpDayCount == len(canAddFollowUpDayDict):
             lastFollowUpDay = TimeUtils.parseToDatetime(currentAllocateDate)
-            lastFollowUpDayWeekDay = lastFollowUpDay.weekday()
-            needForwardDays = 1
-            if lastFollowUpDayWeekDay == 4:
-                needForwardDays = 3
-            elif lastFollowUpDayWeekDay == 5:
-                needForwardDays = 2
-            currentAllocateDate = TimeUtils.formatToDayStr(TimeUtils.addDays(lastFollowUpDay, needForwardDays))
-            if currentAllocateDate not in can_not_follow_up_days:
+            currentAllocateDate = TimeUtils.formatToDayStr(TimeUtils.addDays(lastFollowUpDay, 1))
+            if isDayCanFollowUp(currentAllocateDate):
                 print("currentAllocateDate = %s" % currentAllocateDate)
                 canAddFollowUpDayDict[currentAllocateDate] = 0
 
@@ -173,8 +175,6 @@ while nextPageElement is None or nextPageElement.get_attribute("aria-disabled") 
     # 点击下一页
     nextPageElement = driver.find_element_by_class_name("ant-pagination-next")
 
-
 driver.find_elements_by_class_name("_2-cVhQR")[0].click()
 print("follow up over")
 os._exit(1)
-

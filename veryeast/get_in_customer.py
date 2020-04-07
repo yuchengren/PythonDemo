@@ -25,7 +25,7 @@ first_menu_index = ConditionEnums.HomeFirstMenu.crm_system.value
 second_menu_index = ConditionEnums.CRMSystemChildMenu.personal_console.value
 third_menu_index = ConditionEnums.PersonalConsoleChildMenu.my_public_sea.value
 # 私有配置项
-public_sea_condition_index = ConditionEnums.PublicSeaEnum.recruit_fourth_part.value  # 筛选条件-所属公海
+public_sea_condition_index = ConditionEnums.PublicSeaEnum.ve_marketing_center.value  # 筛选条件-所属公海
 customer_source_index = ConditionEnums.CustomerSource.very_east_register.value  # 筛选条件-客户来源
 except_customer_name = []  # 需要排除的客户名称
 today = time.strftime("%Y-%m-%d")
@@ -94,7 +94,7 @@ def get_in_customer(customer_index):
         ActionChains(driver).send_keys(Keys.ENTER).perform()
         time.sleep(0.025)
 
-customer_size = 1  # 可揽入客户的数量
+customer_size = 2  # 可揽入客户的数量
 thread_list = []
 for index in range(customer_size):
     try:
