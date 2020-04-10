@@ -126,13 +126,22 @@ nextPageElement = None
 while nextPageElement is None or nextPageElement.get_attribute("aria-disabled") == "false":
     if nextPageElement is not None:
         driver.execute_script("arguments[0].click();", nextPageElement)
+        print("click next page")
         WebDriverWait(driver, 10).until(EC.visibility_of_element_located((By.CLASS_NAME, "ant-table-spin-holder")))
     WebDriverWait(driver, 10).until_not(EC.visibility_of_element_located((By.CLASS_NAME, "ant-table-spin-holder")))
     if nextPageElement is not None:
-        time.sleep(1)
+        time.sleep(2)
     listElement = WebDriverWait(driver, 10).until(EC.visibility_of_element_located((By.CLASS_NAME, "ant-table-tbody")))
     WebDriverWait(driver, 10).until(EC.visibility_of_all_elements_located((By.CLASS_NAME, "ant-table-row")))
     listRows = listElement.find_elements_by_class_name("ant-table-row")
+
+    print("current total count = %d " % getListTotalNumber())
+    name_list = []
+    for tableRow in listRows:
+        name_el = tableRow.find_element_by_tag_name("a")
+        name_list.append(name_el.text)
+    print(name_list)
+
     # 当前页客户的跟进
     for index, row in enumerate(listRows):
         row.find_elements_by_tag_name("td")[11].find_element_by_tag_name("a").click()  # 点击跟进客户

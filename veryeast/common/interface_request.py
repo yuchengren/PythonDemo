@@ -1,11 +1,23 @@
+import json
+import time
+
 import requests
 
-from veryeast.config import veryeast_config
+from base.selenium import CookieUtils
+from veryeast.config import veryeast_config, veryeast_info
 
 
-def request(driver, path, param_dict):
+def post(driver, path, param_dict, jsession_id=""):
     url = veryeast_config.HOST + path
-    headers = {
-
-    }
-    response = requests.post(url, data=param_dict, headers=headers)
+    cookie_dict = CookieUtils.getCookiesDict(driver)
+    cookie_str = CookieUtils.getCookiesStr(driver)
+    cookie_str = "JSESSIONID=%s; %s" % (jsession_id, cookie_str)
+    cookie_dict["JSESSIONID"] = jsession_id
+    _headers = {"admin-token": cookie_dict["admin-token"], "content_Type": "multipart/form-data",
+                "x-requested-with": "XMLHttpRequest", "Cookie": cookie_str}
+    param_dict["token"] = veryeast_info.USER_NAME
+    param_dict["loginName"] = veryeast_info.USER_NAME
+    before_request_time = time.time()
+    response = requests.post(url, data=param_dict, headers=_headers)
+    print("path=%s,request_time = %f,response=%s" % (path, (time.time() - before_request_time), response.text))
+    return json.loads(response.text)

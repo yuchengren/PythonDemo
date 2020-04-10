@@ -21,11 +21,9 @@ def login(driver: WebDriver):
     driver.get(veryeast.config.veryeast_info.BG_SYSTEM_URL)
     # 获取屏幕缩放因子
     devicePixelRatio = driver.execute_script("return window.devicePixelRatio")
-    print("devicePixelRatio=%s" % devicePixelRatio)
 
     width = driver.execute_script("return document.documentElement.scrollWidth")
     height = driver.execute_script("return document.documentElement.scrollHeight")
-    print("width=%s, height=%s" % (width, height))
     driver.set_window_size(width, height)
     # 输入用户名
     inputUserNameElement = driver.find_element_by_id("username")
@@ -44,7 +42,6 @@ def login(driver: WebDriver):
     verifyCodeImgRight = verifyCodeImgLeft + verifyCodeImgSize['width']
     verifyCodeImgBottom = verifyCodeImgTop + verifyCodeImgSize['height']
 
-    print((verifyCodeImgLeft, verifyCodeImgTop, verifyCodeImgRight, verifyCodeImgBottom))
     # 登录页面全屏截图
     # driver.get_screenshot_as_file(imgFilePath)
     # 从全屏截图 截取验证码区域
@@ -58,14 +55,12 @@ def login(driver: WebDriver):
     # verifyCodeImg.save(imgFilePath)
     # time.sleep(0.5)
     verifyCode = ""
-    print("verifyCode = %s" % verifyCode)
 
     # 输入验证码
     verifyCodeElement = driver.find_element_by_id("Txtidcode")
     verifyCodeElement.send_keys(verifyCode)
 
     verifyCodeValue = verifyCodeElement.get_attribute('value').strip()
-    print("verifyCodeValue = %s" % verifyCodeValue)
     while len(verifyCodeValue) != 4:
         time.sleep(5)
         verifyCodeValue = verifyCodeElement.get_attribute('value').strip()

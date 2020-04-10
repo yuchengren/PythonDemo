@@ -62,8 +62,9 @@ def get_in_customer(customer_index):
 
     # 展开更多条件-选择客户来源
     driver.find_elements_by_class_name("_2-cVhQR")[1].click()  # 点击展开更多条件
-    customerFrom = WebDriverWait(driver, 10).until(
-        EC.visibility_of_element_located((By.XPATH,'//*[@id="heiSearch"]/div/div[1]/div[2]/div[6]/div/div/div/div/div/div[2]/div/div')))
+
+    more_condition_groups = WebDriverWait(driver, 10).until(EC.visibility_of_all_elements_located((By.CLASS_NAME, '_29skZdk')))
+    customerFrom = more_condition_groups[4].find_element_by_class_name("_3uDQ_Bd").find_element_by_class_name("ant-select-selection")
     customerFrom.click()
     customerFromPopId = customerFrom.get_attribute("aria-controls")
     customerFromPop = WebDriverWait(driver, 5).until(EC.visibility_of_element_located((By.ID, customerFromPopId)))
@@ -92,9 +93,9 @@ def get_in_customer(customer_index):
     WebDriverWait(driver, 10, 0.02).until(EC.element_to_be_clickable((By.CLASS_NAME, "ant-btn-primary")))
     while True:
         ActionChains(driver).send_keys(Keys.ENTER).perform()
-        time.sleep(0.025)
+        time.sleep(0.005)
 
-customer_size = 2  # 可揽入客户的数量
+customer_size = 1  # 可揽入客户的数量
 thread_list = []
 for index in range(customer_size):
     try:

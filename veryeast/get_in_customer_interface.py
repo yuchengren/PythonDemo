@@ -16,8 +16,9 @@ from selenium.webdriver.common.by import By
 import time
 
 from base.utils import UrlUtils
+from veryeast.config import paths
 from veryeast.enum import ConditionEnums
-from veryeast.common import bg_system_login
+from veryeast.common import bg_system_login, interface_request
 from veryeast.common import select_three_menus
 
 # 通用配置项
@@ -62,8 +63,9 @@ dataPopTimeInputs = dataPop.find_elements_by_class_name("ant-calendar-input")
 
 # 展开更多条件-选择客户来源
 driver.find_elements_by_class_name("_2-cVhQR")[1].click()  # 点击展开更多条件
-customerFrom = WebDriverWait(driver, 10).until(
-    EC.visibility_of_element_located((By.XPATH,'//*[@id="heiSearch"]/div/div[1]/div[2]/div[6]/div/div/div/div/div/div[2]/div/div')))
+
+more_condition_groups = WebDriverWait(driver, 10).until(EC.visibility_of_all_elements_located((By.CLASS_NAME, '_29skZdk')))
+customerFrom = more_condition_groups[4].find_element_by_class_name("_3uDQ_Bd").find_element_by_class_name("ant-select-selection")
 customerFrom.click()
 customerFromPopId = customerFrom.get_attribute("aria-controls")
 customerFromPop = WebDriverWait(driver, 5).until(EC.visibility_of_element_located((By.ID, customerFromPopId)))
@@ -96,10 +98,33 @@ def get_customers_info(index):
             break
 
 
-for index in range(len(tableRows)):
-    get_customers_info(index)
+def execute_get_in_interface(param_dict, jsession_id):
+    is_success = False
+    while not is_success:
+        is_success = interface_request.post(driver, paths.get_in_customer, customer_dict, jsession_id)["success"]
 
+get_customers_info(0)
+# for index in range(len(tableRows)):
+#     get_customers_info(index)
+print(customer_dict_list)
 
+jsession_id = ""
+while jsession_id == "":
+    jsession_id = driver.find_element_by_class_name("_7rOOrwL").find_element_by_tag_name("input").get_attribute("value").strip()
+    time.sleep(1)
+
+thread_list = []
+for customer_dict in customer_dict_list:
+    try:
+        thread = threading.Thread(target=execute_get_in_interface, args=(customer_dict, jsession_id))
+        thread.start()
+        thread_list.append(thread)
+    except Exception as e:
+        print("get in customer %s, occur exception:" % customer_dict)
+        traceback.print_exc()
+
+for t in thread_list:
+    t.join()  # 线程A中使用B.join()表示线程A在调用join()处被阻塞，且要等待线程B的完成才能继续执行
 
 os._exit(1)
 
