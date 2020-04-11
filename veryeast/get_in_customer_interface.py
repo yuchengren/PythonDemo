@@ -7,6 +7,7 @@ import sys
 import threading
 import traceback
 
+from jinja2.nodes import Pair
 from selenium import webdriver
 from selenium.webdriver import ActionChains
 from selenium.webdriver.common.keys import Keys
@@ -15,6 +16,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
 import time
 
+from base.selenium import CookieUtils
 from base.utils import UrlUtils
 from veryeast.config import paths
 from veryeast.enum import ConditionEnums
@@ -32,6 +34,7 @@ except_customer_name = []  # 需要排除的客户名称
 today = time.strftime("%Y-%m-%d")
 startDay = today
 endDDay = today
+interface_request_interval = 0.02
 
 customer_dict_list = []
 
@@ -98,29 +101,47 @@ def get_customers_info(index):
             break
 
 
-def execute_get_in_interface(param_dict, jsession_id):
+def execute_get_in_one_customer(customer_dict, jsession_id):
     is_success = False
-    while not is_success:
-        is_success = interface_request.post(driver, paths.get_in_customer, customer_dict, jsession_id)["success"]
+    customer_dict_pair = [customer_dict, is_success]
+    lock = threading.Lock()
+    while True:
+        lock.acquire()
+        if not customer_dict_pair[1]:
+            threading.Thread(target=execute_get_in_interface, args=(lock, customer_dict_pair, jsession_id)).start()
+            lock.release()
+            time.sleep(interface_request_interval)
+        else:
+            lock.release()
+            break
 
-get_customers_info(0)
+
+def execute_get_in_interface(lock, customer_dict_pair, jsession_id):
+    is_success = interface_request.post(paths.get_in_customer, cookie_dict, customer_dict_pair[0], jsession_id)["success"]
+    lock.acquire()
+    customer_dict_pair[1] = is_success
+    lock.release()
+
+
+for index in range(2):
 # for index in range(len(tableRows)):
-#     get_customers_info(index)
+    get_customers_info(index)
 print(customer_dict_list)
 
+cookie_dict = CookieUtils.getCookiesDict(driver)
 jsession_id = ""
 while jsession_id == "":
     jsession_id = driver.find_element_by_class_name("_7rOOrwL").find_element_by_tag_name("input").get_attribute("value").strip()
     time.sleep(1)
 
 thread_list = []
-for customer_dict in customer_dict_list:
+for customer_dict_list_item in customer_dict_list:
     try:
-        thread = threading.Thread(target=execute_get_in_interface, args=(customer_dict, jsession_id))
+        thread = threading.Thread(target=execute_get_in_one_customer, args=(customer_dict_list_item, jsession_id))
         thread.start()
         thread_list.append(thread)
     except Exception as e:
-        print("get in customer %s, occur exception:" % customer_dict)
+        print("get in customer %s, occur exception:" % customer_dict_list_item)
         traceback.print_exc()
 
 for t in thread_list:

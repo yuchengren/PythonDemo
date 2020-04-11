@@ -7,6 +7,10 @@ def getCookiesStr(driver):
     return cookie_str
 
 
+def getCookieStrFromDict(cookie_dict):
+    return '; '.join(item[0] + "=" + item[1] for item in cookie_dict.items())
+
+
 def getCookiesDict(driver):
     cookie_dict = {}
     for item in driver.get_cookies():
