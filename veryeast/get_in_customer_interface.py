@@ -28,13 +28,13 @@ first_menu_index = ConditionEnums.HomeFirstMenu.crm_system.value
 second_menu_index = ConditionEnums.CRMSystemChildMenu.personal_console.value
 third_menu_index = ConditionEnums.PersonalConsoleChildMenu.my_public_sea.value
 # 私有配置项
-public_sea_condition_index = ConditionEnums.PublicSeaEnum.recruit_fourth_part_prepare.value  # 筛选条件-所属公海
+public_sea_condition_index = ConditionEnums.PublicSeaEnum.ve_marketing_center.value  # 筛选条件-所属公海
 customer_source_index = ConditionEnums.CustomerSource.very_east_register.value  # 筛选条件-客户来源
 except_customer_name = []  # 需要排除的客户名称
 today = time.strftime("%Y-%m-%d")
 startDay = today
 endDDay = today
-interface_request_interval = 0.02
+interface_request_interval = 0.01
 
 customer_dict_list = []
 
@@ -61,8 +61,8 @@ driver.find_element_by_class_name("ant-calendar-picker-Large").click()  # 开始
 dataPop = WebDriverWait(driver, 5).until(
     EC.visibility_of_element_located((By.CLASS_NAME, "ant-calendar-date-panel")))
 dataPopTimeInputs = dataPop.find_elements_by_class_name("ant-calendar-input")
-# dataPopTimeInputs[0].send_keys(startDay)
-# dataPopTimeInputs[1].send_keys(endDDay)
+dataPopTimeInputs[0].send_keys(startDay)
+dataPopTimeInputs[1].send_keys(endDDay)
 
 # 展开更多条件-选择客户来源
 driver.find_elements_by_class_name("_2-cVhQR")[1].click()  # 点击展开更多条件
@@ -123,8 +123,7 @@ def execute_get_in_interface(lock, customer_dict_pair, jsession_id):
     lock.release()
 
 
-for index in range(2):
-# for index in range(len(tableRows)):
+for index in range(len(tableRows)):
     get_customers_info(index)
 print(customer_dict_list)
 

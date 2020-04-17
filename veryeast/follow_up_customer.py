@@ -130,7 +130,7 @@ while nextPageElement is None or nextPageElement.get_attribute("aria-disabled") 
         WebDriverWait(driver, 10).until(EC.visibility_of_element_located((By.CLASS_NAME, "ant-table-spin-holder")))
     WebDriverWait(driver, 10).until_not(EC.visibility_of_element_located((By.CLASS_NAME, "ant-table-spin-holder")))
     if nextPageElement is not None:
-        time.sleep(2)
+        time.sleep(3)
     listElement = WebDriverWait(driver, 10).until(EC.visibility_of_element_located((By.CLASS_NAME, "ant-table-tbody")))
     WebDriverWait(driver, 10).until(EC.visibility_of_all_elements_located((By.CLASS_NAME, "ant-table-row")))
     listRows = listElement.find_elements_by_class_name("ant-table-row")
