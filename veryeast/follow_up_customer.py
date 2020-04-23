@@ -59,7 +59,6 @@ print(canAddFollowUpDayList)
 currentAllocateDate = canAddFollowUpDayList[0]
 print("currentAllocateDate = %s" % currentAllocateDate)
 mainWindow = driver.current_window_handle
-WebDriverWait(driver, 10).until(EC.visibility_of_element_located((By.CLASS_NAME, "_1VePUHA")))  # 筛选条件区域
 
 
 def resetNextFollowUpTimesAndSearchAgain(start_time, end_time):
@@ -94,7 +93,6 @@ def getListTotalNumber():
     totalElement = ElementUtils.findElement(driver, By.CLASS_NAME, "ant-pagination-total-text")
     if totalElement is None:
         return 0
-    # totalElement = WebDriverWait(driver, 10).until(EC.visibility_of_element_located((By.CLASS_NAME, "ant-pagination-total-text")))
     return int(totalElement.text.split("共")[1].split("条")[0].strip())
 
 
@@ -106,31 +104,41 @@ def getPageCount():
     return int(totalElement.text.split("条/页")[0].strip())
 
 
+def changePageCountToMax():
+    page_count_parent_el = WebDriverWait(driver, 10).until(
+        EC.visibility_of_element_located((By.CLASS_NAME, "ant-pagination-options-size-changer")))
+    page_count_el = page_count_parent_el.find_element_by_class_name("ant-select-selection")
+    page_count_el.click()
+    page_count_select_pop_id = page_count_el.get_attribute("aria-controls")
+    page_count_select_pop = WebDriverWait(driver, 10).until(EC.visibility_of_element_located((By.ID, page_count_select_pop_id)))
+    page_count_select_options = page_count_select_pop.find_element_by_tag_name("ul").find_elements_by_tag_name("li")
+    page_count_select_options[-1].click()
+    WebDriverWait(driver, 10).until(EC.visibility_of_element_located((By.CLASS_NAME, "ant-table-spin-holder")))
+    WebDriverWait(driver, 10).until_not(EC.visibility_of_element_located((By.CLASS_NAME, "ant-table-spin-holder")))
+
+
+changePageCountToMax()
+WebDriverWait(driver, 10).until(EC.visibility_of_element_located((By.CLASS_NAME, "_1VePUHA")))  # 筛选条件区域
 WebDriverWait(driver, 5).until(EC.presence_of_element_located((By.CLASS_NAME, "ant-calendar-picker-icon")))
 WebDriverWait(driver, 5).until(EC.presence_of_element_located((By.CLASS_NAME, "ant-calendar-picker-input")))
 # 获取跟进日期在今天以前的数据量
 resetNextFollowUpTimesAndSearchAgain("", nextFollowUpEndDay)
 waitFollowUpTotalNumber = getListTotalNumber()
 print("waitFollowUpTotalNumber=%d" % waitFollowUpTotalNumber)
-
 # 获取未来指定分配的日期的数据量
 for i in canAddFollowUpDayList:
     resetNextFollowUpTimesAndSearchAgain(i, i)
     canAddFollowUpDayDict[i] = getListTotalNumber()
 print(canAddFollowUpDayDict)
-
 #  获取跟进日期在今天以前的数据列表
 resetNextFollowUpTimesAndSearchAgain("", nextFollowUpEndDay)
 
 nextPageElement = None
 while nextPageElement is None or nextPageElement.get_attribute("aria-disabled") == "false":
     if nextPageElement is not None:
-        driver.execute_script("arguments[0].click();", nextPageElement)
-        print("click next page")
+        driver.find_elements_by_class_name("_2-cVhQR")[0].click()
         WebDriverWait(driver, 10).until(EC.visibility_of_element_located((By.CLASS_NAME, "ant-table-spin-holder")))
     WebDriverWait(driver, 10).until_not(EC.visibility_of_element_located((By.CLASS_NAME, "ant-table-spin-holder")))
-    if nextPageElement is not None:
-        time.sleep(3)
     listElement = WebDriverWait(driver, 10).until(EC.visibility_of_element_located((By.CLASS_NAME, "ant-table-tbody")))
     WebDriverWait(driver, 10).until(EC.visibility_of_all_elements_located((By.CLASS_NAME, "ant-table-row")))
     listRows = listElement.find_elements_by_class_name("ant-table-row")
@@ -175,15 +183,12 @@ while nextPageElement is None or nextPageElement.get_attribute("aria-disabled") 
         nextFollowUpDateElement.send_keys(Keys.ENTER)
 
         driver.find_element_by_class_name("ant-btn-primary").click()
-        time.sleep(0.2)
-        # WebDriverWait(driver, 10).until_not(EC.visibility_of_element_located((By.ID, "dRadioText-101")))
         canAddFollowUpDayDict[currentAllocateDate] = canAddFollowUpDayDict[currentAllocateDate] + 1
         driver.switch_to.window(mainWindow)
         # 我的公海iframe区域
         iframe = WebDriverWait(driver, 10).until(EC.visibility_of_element_located((By.TAG_NAME, "iframe")))
         driver.switch_to.frame(iframe)
-
-    # 点击下一页
+    # 下一页
     nextPageElement = driver.find_element_by_class_name("ant-pagination-next")
 
 driver.find_elements_by_class_name("_2-cVhQR")[0].click()

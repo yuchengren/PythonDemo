@@ -34,7 +34,7 @@ except_customer_name = []  # 需要排除的客户名称
 today = time.strftime("%Y-%m-%d")
 startDay = today
 endDDay = today
-interface_request_interval = 0.01
+interface_request_interval = 0.005
 
 customer_dict_list = []
 
