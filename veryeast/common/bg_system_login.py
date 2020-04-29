@@ -92,7 +92,7 @@ def login(driver: WebDriver):
                 loginElement = None
 
     # 进入主页面后
-    WebDriverWait(driver, 5).until(EC.presence_of_element_located((By.CLASS_NAME, "sider___g53Yu")))
+    WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CLASS_NAME, "sider___g53Yu")))
     print("cookiesStr = %s" % CookieUtils.getCookiesStr(driver))
 
 

@@ -43,21 +43,21 @@ nextFollowUpEndDay = TimeUtils.formatToDayStr(today + datetime.timedelta(days=fo
 
 
 def isDayCanFollowUp(day):
-    _canAddFollowUpDayStr = TimeUtils.formatToDayStr(canAddFollowUpDay)
+    _canAddFollowUpDayStr = TimeUtils.formatToDayStr(day)
     return TimeUtils.isWeekday(day) and _canAddFollowUpDayStr not in can_not_follow_up_days or \
            TimeUtils.isWeekend(day) and _canAddFollowUpDayStr in weekend_is_weekdays
 
 
 canAddFollowUpDayList = []
 canAddFollowUpDayDict = {}
-canAddFollowUpDay = today + datetime.timedelta(days=follow_up_first_day_interval_today)
+canAddFollowUpDatetime = today + datetime.timedelta(days=follow_up_first_day_interval_today)
 while len(canAddFollowUpDayList) < maxFollowUpForwardDays:
-    if isDayCanFollowUp(canAddFollowUpDay):
-        canAddFollowUpDayList.append(TimeUtils.formatToDayStr(canAddFollowUpDay))
-    canAddFollowUpDay = canAddFollowUpDay + datetime.timedelta(days=1)
+    if isDayCanFollowUp(canAddFollowUpDatetime):
+        canAddFollowUpDayList.append(TimeUtils.formatToDayStr(canAddFollowUpDatetime))
+    canAddFollowUpDatetime = canAddFollowUpDatetime + datetime.timedelta(days=1)
 print(canAddFollowUpDayList)
-currentAllocateDate = canAddFollowUpDayList[0]
-print("currentAllocateDate = %s" % currentAllocateDate)
+currentAllocateDateStr = canAddFollowUpDayList[0]
+print("currentAllocateDate = %s" % currentAllocateDateStr)
 mainWindow = driver.current_window_handle
 
 
@@ -142,14 +142,6 @@ while nextPageElement is None or nextPageElement.get_attribute("aria-disabled") 
     listElement = WebDriverWait(driver, 10).until(EC.visibility_of_element_located((By.CLASS_NAME, "ant-table-tbody")))
     WebDriverWait(driver, 10).until(EC.visibility_of_all_elements_located((By.CLASS_NAME, "ant-table-row")))
     listRows = listElement.find_elements_by_class_name("ant-table-row")
-
-    print("current total count = %d " % getListTotalNumber())
-    name_list = []
-    for tableRow in listRows:
-        name_el = tableRow.find_element_by_tag_name("a")
-        name_list.append(name_el.text)
-    print(name_list)
-
     # 当前页客户的跟进
     for index, row in enumerate(listRows):
         row.find_elements_by_tag_name("td")[11].find_element_by_tag_name("a").click()  # 点击跟进客户
@@ -164,26 +156,26 @@ while nextPageElement is None or nextPageElement.get_attribute("aria-disabled") 
         fullFollowUpDayCount = 0
         for (k, v) in canAddFollowUpDayDict.items():
             if v < maxEachDayFollowUpNumber:
-                if currentAllocateDate != k:
-                    currentAllocateDate = k
+                if currentAllocateDateStr != k:
+                    currentAllocateDateStr = k
                     print("currentAllocateDate = %s" % k)
                 break
             else:
                 fullFollowUpDayCount += 1
         while fullFollowUpDayCount == len(canAddFollowUpDayDict):
-            lastFollowUpDay = TimeUtils.parseToDatetime(currentAllocateDate)
-            currentAllocateDate = TimeUtils.formatToDayStr(TimeUtils.addDays(lastFollowUpDay, 1))
-            if isDayCanFollowUp(currentAllocateDate):
-                print("currentAllocateDate = %s" % currentAllocateDate)
-                canAddFollowUpDayDict[currentAllocateDate] = 0
+            canAddFollowUpDatetime = TimeUtils.addDays(canAddFollowUpDatetime, 1)
+            if isDayCanFollowUp(canAddFollowUpDatetime):
+                canAddFollowUpDayDict[currentAllocateDateStr] = 0
+                currentAllocateDateStr = TimeUtils.formatToDayStr(canAddFollowUpDatetime)
+                print("currentAllocateDate = %s" % currentAllocateDateStr)
 
         nextFollowUpDateElement = nextFollowUpDatePop.find_element_by_class_name("ant-calendar-input")
         driver.execute_script("arguments[0].value='';", nextFollowUpDateElement)
-        nextFollowUpDateElement.send_keys(currentAllocateDate)
+        nextFollowUpDateElement.send_keys(currentAllocateDateStr)
         nextFollowUpDateElement.send_keys(Keys.ENTER)
 
         driver.find_element_by_class_name("ant-btn-primary").click()
-        canAddFollowUpDayDict[currentAllocateDate] = canAddFollowUpDayDict[currentAllocateDate] + 1
+        canAddFollowUpDayDict[currentAllocateDateStr] = canAddFollowUpDayDict[currentAllocateDateStr] + 1
         driver.switch_to.window(mainWindow)
         # 我的公海iframe区域
         iframe = WebDriverWait(driver, 10).until(EC.visibility_of_element_located((By.TAG_NAME, "iframe")))
