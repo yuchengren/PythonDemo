@@ -34,9 +34,9 @@ except_customer_name = []  # 需要排除的客户名称
 today = time.strftime("%Y-%m-%d")
 startDay = today
 endDDay = today
-interface_request_interval = 0.005
+interface_request_interval = 0.01
 
-customer_dict_list = []
+customer_info_dict_list = []
 
 # 浏览器
 options = webdriver.ChromeOptions()
@@ -93,7 +93,7 @@ def get_customers_info(index):
     for handle in driver.window_handles:
         if current_handle != handle:
             driver.switch_to.window(handle)
-            customer_dict_list.append(UrlUtils.parseUrlParam(driver.current_url))
+            customer_info_dict_list.append(UrlUtils.parseUrlParam(driver.current_url))
             driver.close()
             driver.switch_to.window(current_handle)
             iframe = WebDriverWait(driver, 10).until(EC.visibility_of_element_located((By.TAG_NAME, "iframe")))  # 我的公海iframe区域
@@ -101,9 +101,9 @@ def get_customers_info(index):
             break
 
 
-def execute_get_in_one_customer(customer_dict, jsession_id):
+def execute_get_in_one_customer(customer_interface_param_dict, jsession_id):
     is_success = False
-    customer_dict_pair = [customer_dict, is_success]
+    customer_dict_pair = [customer_interface_param_dict, is_success]
     lock = threading.Lock()
     while True:
         lock.acquire()
@@ -125,7 +125,13 @@ def execute_get_in_interface(lock, customer_dict_pair, jsession_id):
 
 for index in range(len(tableRows)):
     get_customers_info(index)
-print(customer_dict_list)
+print("customer_info_dict_list = " + str(customer_info_dict_list))
+
+customer_interface_param_dict_list = []
+for item in customer_info_dict_list:
+    param_dict = {"customerId": item["id"], "poolId": item["poolId"], "topicId": item["topicId"]}
+    customer_interface_param_dict_list.append(param_dict)
+print("customer_interface_param_dict_list = " + str(customer_interface_param_dict_list))
 
 cookie_dict = CookieUtils.getCookiesDict(driver)
 jsession_id = ""
@@ -134,13 +140,13 @@ while jsession_id == "":
     time.sleep(1)
 
 thread_list = []
-for customer_dict_list_item in customer_dict_list:
+for customer_interface_param_dict_list_item in customer_interface_param_dict_list:
     try:
-        thread = threading.Thread(target=execute_get_in_one_customer, args=(customer_dict_list_item, jsession_id))
+        thread = threading.Thread(target=execute_get_in_one_customer, args=(customer_interface_param_dict_list_item, jsession_id))
         thread.start()
         thread_list.append(thread)
     except Exception as e:
-        print("get in customer %s, occur exception:" % customer_dict_list_item)
+        print("get in customer %s, occur exception:" % customer_interface_param_dict_list_item)
         traceback.print_exc()
 
 for t in thread_list:
