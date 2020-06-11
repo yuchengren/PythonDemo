@@ -28,6 +28,7 @@ def login(driver: WebDriver, username, pwd, tujian_username=None, tujian_pwd=Non
 
     width = driver.execute_script("return document.documentElement.scrollWidth")
     height = driver.execute_script("return document.documentElement.scrollHeight")
+    print("driver width=%d height=%d" % (width, height))
     driver.set_window_size(width, height)
     # 输入用户名
     inputUserNameElement = driver.find_element_by_id("username")
