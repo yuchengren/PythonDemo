@@ -8,7 +8,7 @@ import time
 from selenium.webdriver.common.by import By
 from selenium.webdriver.remote.webdriver import WebDriver
 
-from base.api import baidu_api_helper, tujian_api_helper
+from base.api import tujian_api_helper
 from base.config import account
 from base.selenium import CookieUtils
 from base.utils import TimeUtils

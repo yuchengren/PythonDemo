@@ -10,10 +10,12 @@ def select(driver: WebDriver, first_menu_index: int, second_menu_index: int, thi
     crmSystemElement.click()
     # 点击个人工作台
     subMenu = WebDriverWait(driver, 5).until(EC.presence_of_element_located((By.CLASS_NAME, "sider___1t24v")))
+    WebDriverWait(driver, 5).until(EC.presence_of_all_elements_located((By.CLASS_NAME, "ant-menu-submenu")))
     personalConsole = subMenu.find_elements_by_class_name("ant-menu-submenu")[second_menu_index]
     personalConsole.click()
     # 点击我的公海
     inlineMenu = WebDriverWait(driver, 5).until(EC.visibility_of_element_located((By.XPATH, '//ul[contains(@id,"$Menu")]')))
+    WebDriverWait(driver, 5).until(EC.presence_of_all_elements_located((By.CLASS_NAME, "ant-menu-item")))
     myPublicSea = inlineMenu.find_elements_by_class_name("ant-menu-item")[third_menu_index]
     myPublicSea.click()
 

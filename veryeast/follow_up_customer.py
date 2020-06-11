@@ -14,6 +14,7 @@ from selenium.webdriver.common.by import By
 import datetime
 
 import veryeast
+from base.config import account
 from base.selenium import ElementUtils
 from veryeast.enum import ConditionEnums
 from veryeast.common import bg_system_login
@@ -31,16 +32,16 @@ print("sys_args= %s" % sys_args)
 if len(sys_args) > 1:
     username = sys_args[1]
 else:
-    username = veryeast.config.veryeast_info.USER_NAME
+    username = account.veryeast_username
 if len(sys_args) > 2:
     pwd = sys_args[2]
 else:
-    pwd = veryeast.config.veryeast_info.PASSWORD
+    pwd = account.veryeast_pwd
 # 将要跟进客户的日期距离今天的天数
 if len(sys_args) > 3 and sys_args[3]:
     follow_up_first_day_interval_today = int(sys_args[3])
 else:
-    follow_up_first_day_interval_today = 1
+    follow_up_first_day_interval_today = 0
 # 自动查询将要跟进日期开始往后的日期 跟进客户数量，限制查询的天数，再往后的没有查询到日期，默认当做客户数量为0
 if len(sys_args) > 4 and sys_args[4]:
     query_follow_up_count_days = int(sys_args[4])
