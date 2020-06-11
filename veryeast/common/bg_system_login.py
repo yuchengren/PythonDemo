@@ -24,7 +24,7 @@ def login(driver: WebDriver, username, pwd, tujian_username=None, tujian_pwd=Non
     imgFilePath = veryeast_config.SCREEN_IMG_DIR + "/captcha.png"
 
     # 打开后台网址
-    driver.get(veryeast.config.veryeast_config.BG_SYSTEM_URL)
+    driver.get(veryeast_config.BG_SYSTEM_URL)
 
     width = driver.execute_script("return document.documentElement.scrollWidth")
     height = driver.execute_script("return document.documentElement.scrollHeight")
