@@ -26,8 +26,8 @@ def login(driver: WebDriver, username, pwd, tujian_username=None, tujian_pwd=Non
     # 打开后台网址
     driver.get(veryeast_config.BG_SYSTEM_URL)
 
-    width = driver.execute_script("return window.screen.availWidth")
-    height = driver.execute_script("return window.screen.availHeight")
+    width = driver.execute_script("return document.body.clientWidth")
+    height = driver.execute_script("return document.body.clientHeight")
     print("driver width=%d height=%d" % (width, height))
     driver.set_window_size(width, height)
     # 输入用户名
