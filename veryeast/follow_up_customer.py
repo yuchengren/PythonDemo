@@ -165,6 +165,12 @@ WebDriverWait(driver, 5).until(EC.presence_of_element_located((By.CLASS_NAME, "a
 resetNextFollowUpTimesAndSearchAgain("", nextFollowUpEndDay)
 waitFollowUpTotalNumber = getListTotalNumber()
 print("waitFollowUpTotalNumber=%d" % waitFollowUpTotalNumber)
+if waitFollowUpTotalNumber == 0:
+    if is_jenkins_execute:
+        driver.quit()
+    else:
+        os._exit(1)
+
 # 获取未来指定分配的日期的数据量
 for i in canAddFollowUpDayList:
     resetNextFollowUpTimesAndSearchAgain(i, i)
