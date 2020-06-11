@@ -70,6 +70,8 @@ is_jenkins_execute = len(sys_args) > 1
 options = webdriver.ChromeOptions()
 if is_jenkins_execute:
     options.add_argument('--headless')
+    options.add_argument('--no-sandbox')
+    options.add_argument('--disable-dev-shm-usage')
 driver = webdriver.Chrome(executable_path="chromedriver", options=options)
 # driver = webdriver.Firefox()
 bg_system_login.login(driver, username, pwd, tujian_username, tujian_pwd)
