@@ -65,8 +65,11 @@ can_not_follow_up_days = ["2020-05-01", "2020-05-04", "2020-05-05", "2020-06-25"
                           "2020-10-01", "2020-10-02", "2020-10-05", "2020-10-06", "2020-10-07", "2020-10-08"]
 weekend_is_weekdays = ["2020-04-26", "2020-05-09", "2020-06-28", "2020-09-27", "2020-10-10"]
 
+is_jenkins_execute = len(sys_args) > 1
 # 浏览器
 options = webdriver.ChromeOptions()
+if is_jenkins_execute:
+    options.add_argument('--headless')
 driver = webdriver.Chrome(executable_path="chromedriver", options=options)
 # driver = webdriver.Firefox()
 bg_system_login.login(driver, username, pwd, tujian_username, tujian_pwd)
@@ -219,4 +222,5 @@ while nextPageElement is None or nextPageElement.get_attribute("aria-disabled") 
 
 driver.find_elements_by_class_name("_2-cVhQR")[0].click()
 print("follow up over")
-# os._exit(1)
+if not is_jenkins_execute:
+    os._exit(1)
