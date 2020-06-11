@@ -41,7 +41,7 @@ else:
 if len(sys_args) > 3 and sys_args[3]:
     follow_up_first_day_interval_today = int(sys_args[3])
 else:
-    follow_up_first_day_interval_today = 0
+    follow_up_first_day_interval_today = 1
 # 自动查询将要跟进日期开始往后的日期 跟进客户数量，限制查询的天数，再往后的没有查询到日期，默认当做客户数量为0
 if len(sys_args) > 4 and sys_args[4]:
     query_follow_up_count_days = int(sys_args[4])
@@ -95,9 +95,7 @@ while len(canAddFollowUpDayList) < query_follow_up_count_days:
     if isDayCanFollowUp(canAddFollowUpDatetime):
         canAddFollowUpDayList.append(TimeUtils.formatToDayStr(canAddFollowUpDatetime))
     canAddFollowUpDatetime = canAddFollowUpDatetime + datetime.timedelta(days=1)
-print(canAddFollowUpDayList)
 currentAllocateDateStr = canAddFollowUpDayList[0]
-print("currentAllocateDate = %s" % currentAllocateDateStr)
 mainWindow = driver.current_window_handle
 
 
@@ -199,29 +197,20 @@ while nextPageElement is None or nextPageElement.get_attribute("aria-disabled") 
         driver.find_element_by_class_name("ant-calendar-picker-input").click()
         nextFollowUpDatePop = WebDriverWait(driver, 10).until(
             EC.visibility_of_element_located((By.CLASS_NAME, "ant-calendar-picker-container-placement-bottomLeft")))
-        fullFollowUpDayCount = 0
-        for (k, v) in canAddFollowUpDayDict.items():
-            if v < max_each_day_follow_up_count:
-                if currentAllocateDateStr != k:
-                    currentAllocateDateStr = k
-                    print("currentAllocateDate = %s" % k)
-                break
-            else:
-                fullFollowUpDayCount += 1
-        while fullFollowUpDayCount == len(canAddFollowUpDayDict):
-            canAddFollowUpDatetime = TimeUtils.addDays(canAddFollowUpDatetime, 1)
+        lastAllocateDateStr = currentAllocateDateStr
+        while canAddFollowUpDayDict.get(currentAllocateDateStr, 0) >= max_each_day_follow_up_count:
+            canAddFollowUpDatetime = TimeUtils.addDays(TimeUtils.parseToDatetime(currentAllocateDateStr), 1)
             if isDayCanFollowUp(canAddFollowUpDatetime):
-                canAddFollowUpDayDict[currentAllocateDateStr] = 0
                 currentAllocateDateStr = TimeUtils.formatToDayStr(canAddFollowUpDatetime)
-                print("currentAllocateDate = %s" % currentAllocateDateStr)
-
+        if lastAllocateDateStr != currentAllocateDateStr or currentAllocateDateStr == canAddFollowUpDayList[0]:
+            print("currentAllocateDate = %s" % currentAllocateDateStr)
         nextFollowUpDateElement = nextFollowUpDatePop.find_element_by_class_name("ant-calendar-input")
         driver.execute_script("arguments[0].value='';", nextFollowUpDateElement)
         nextFollowUpDateElement.send_keys(currentAllocateDateStr)
         nextFollowUpDateElement.send_keys(Keys.ENTER)
 
         driver.find_element_by_class_name("ant-btn-primary").click()
-        canAddFollowUpDayDict[currentAllocateDateStr] = canAddFollowUpDayDict[currentAllocateDateStr] + 1
+        canAddFollowUpDayDict[currentAllocateDateStr] = canAddFollowUpDayDict.get(currentAllocateDateStr, 0) + 1
         driver.switch_to.window(mainWindow)
         # 我的公海iframe区域
         iframe = WebDriverWait(driver, 10).until(EC.visibility_of_element_located((By.TAG_NAME, "iframe")))
