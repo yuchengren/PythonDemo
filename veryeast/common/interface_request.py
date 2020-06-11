@@ -3,8 +3,9 @@ import time
 
 import requests
 
+import base.config.account
 from base.selenium import CookieUtils
-from veryeast.config import veryeast_config, veryeast_info
+from veryeast.config import veryeast_config
 
 
 def post(path, cookie_dict, param_dict, jsession_id=""):
@@ -16,8 +17,8 @@ def post(path, cookie_dict, param_dict, jsession_id=""):
                 "content_Type": "multipart/form-data",
                 "x-requested-with": "XMLHttpRequest",
                 "Cookie": cookie_str}
-    param_dict["token"] = veryeast_info.USER_NAME
-    param_dict["loginName"] = veryeast_info.USER_NAME
+    param_dict["token"] = base.config.account.veryeast_username
+    param_dict["loginName"] = base.config.account.veryeast_username
     before_request_time = time.time()
     response = requests.post(url, data=param_dict, headers=_headers)
     print("path=%s,request_time = %f,response=%s" % (path, (time.time() - before_request_time), response.text))

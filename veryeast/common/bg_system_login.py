@@ -8,7 +8,6 @@ import time
 from selenium.webdriver.common.by import By
 from selenium.webdriver.remote.webdriver import WebDriver
 
-import veryeast.config.veryeast_info
 from base.api import baidu_api_helper, tujian_api_helper
 from base.config import account
 from base.selenium import CookieUtils

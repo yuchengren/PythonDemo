@@ -9,7 +9,7 @@ import time
 from selenium.webdriver.chrome.webdriver import WebDriver
 from selenium.webdriver.common.by import By
 
-import veryeast.config.veryeast_info
+import base.config.account
 from veryeast.config import veryeast_config
 from PIL import Image, ImageEnhance
 import pytesseract
@@ -61,7 +61,7 @@ def inputPwdCaptchaAndLogin(driver: WebDriver, imgFilePath, devicePixelRatio):
     captchaScreenShot(driver, imgFilePath, devicePixelRatio)
     # 输入密码
     inputPasswordElement = driver.find_element_by_id("password")
-    inputPasswordElement.send_keys(veryeast.config.veryeast_info.PASSWORD)
+    inputPasswordElement.send_keys(base.config.account.veryeast_pwd)
     verifyCode = recognize_captcha(imgFilePath)
     print("recognize verifyCode = %s" % verifyCode)
     # 输入验证码
@@ -95,7 +95,7 @@ def login(driver: WebDriver):
     driver.set_window_size(width, height)
     # 输入用户名
     inputUserNameElement = driver.find_element_by_id("username")
-    inputUserNameElement.send_keys(veryeast.config.veryeast_info.USER_NAME)
+    inputUserNameElement.send_keys(base.config.account.veryeast_username)
 
     loginElement = driver.find_element_by_id("butn")
     while loginElement is not None:
