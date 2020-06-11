@@ -15,7 +15,7 @@ pipeline{
     stages{
         stage('follow_up'){
             steps{
-                 sh 'export PYTHONPATH=${$WORKSPACE} && python3 ${$WORKSPACE}/veryeast/follow_up_customer.py "$VERYEAST_USR" "$VERYEAST_PSW" "$follow_up_first_day_interval_today" "$query_follow_up_count_days" "$max_each_day_follow_up_count" "$TUJIAN_USR" "$TUJIAN_PSW" '
+                 sh 'export PYTHONPATH=${WORKSPACE} && python3 ${WORKSPACE}/veryeast/follow_up_customer.py "$VERYEAST_USR" "$VERYEAST_PSW" "$follow_up_first_day_interval_today" "$query_follow_up_count_days" "$max_each_day_follow_up_count" "$TUJIAN_USR" "$TUJIAN_PSW" '
             }
         }
     }
