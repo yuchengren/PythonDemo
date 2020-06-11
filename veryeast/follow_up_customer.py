@@ -3,6 +3,7 @@
 跟进客户
 """
 import os
+import sys
 import time
 
 from selenium import webdriver
@@ -12,6 +13,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
 import datetime
 
+import veryeast
 from base.selenium import ElementUtils
 from veryeast.enum import ConditionEnums
 from veryeast.common import bg_system_login
@@ -23,10 +25,42 @@ from base.utils import TimeUtils
 first_menu_index = ConditionEnums.HomeFirstMenu.crm_system.value
 second_menu_index = ConditionEnums.CRMSystemChildMenu.personal_console.value
 third_menu_index = ConditionEnums.PersonalConsoleChildMenu.my_customer.value
-maxEachDayFollowUpNumber = 55
-conditionNextFollowUpIntervalDay = 14  # 下次跟进开始日期和结束日期的间隔天数
-maxFollowUpForwardDays = 5  # 跟进客户日期推前的最大天数
-follow_up_first_day_interval_today = 1  # 将要跟进客户的日期距离今天的天数
+
+sys_args = sys.argv
+print("sys_args= %s" % sys_args)
+if len(sys_args) > 1:
+    username = sys_args[1]
+else:
+    username = veryeast.config.veryeast_info.USER_NAME
+if len(sys_args) > 2:
+    pwd = sys_args[2]
+else:
+    pwd = veryeast.config.veryeast_info.PASSWORD
+# 将要跟进客户的日期距离今天的天数
+if len(sys_args) > 3 and sys_args[3]:
+    follow_up_first_day_interval_today = int(sys_args[3])
+else:
+    follow_up_first_day_interval_today = 1
+# 自动查询将要跟进日期开始往后的日期 跟进客户数量，限制查询的天数，再往后的没有查询到日期，默认当做客户数量为0
+if len(sys_args) > 4 and sys_args[4]:
+    query_follow_up_count_days = int(sys_args[4])
+else:
+    query_follow_up_count_days = 5
+# 每天可安排的客户最大数量
+if len(sys_args) > 5 and sys_args[5]:
+    max_each_day_follow_up_count = int(sys_args[5])
+else:
+    max_each_day_follow_up_count = 55
+
+if len(sys_args) > 6:
+    tujian_username = sys_args[6]
+else:
+    tujian_username = None
+if len(sys_args) > 7:
+    tujian_pwd = sys_args[7]
+else:
+    tujian_pwd = None
+
 can_not_follow_up_days = ["2020-05-01", "2020-05-04", "2020-05-05", "2020-06-25", "2020-06-26",
                           "2020-10-01", "2020-10-02", "2020-10-05", "2020-10-06", "2020-10-07", "2020-10-08"]
 weekend_is_weekdays = ["2020-04-26", "2020-05-09", "2020-06-28", "2020-09-27", "2020-10-10"]
@@ -34,11 +68,11 @@ weekend_is_weekdays = ["2020-04-26", "2020-05-09", "2020-06-28", "2020-09-27", "
 # 浏览器
 options = webdriver.ChromeOptions()
 driver = webdriver.Chrome(executable_path="chromedriver", options=options)
-bg_system_login.login(driver)
+# driver = webdriver.Firefox()
+bg_system_login.login(driver, username, pwd, tujian_username, tujian_pwd)
 select_three_menus.select(driver, first_menu_index, second_menu_index, third_menu_index)
 
 today = datetime.datetime.now()
-nextFollowUpstartDay = TimeUtils.formatToDayStr(today + datetime.timedelta(days=-conditionNextFollowUpIntervalDay))
 nextFollowUpEndDay = TimeUtils.formatToDayStr(today + datetime.timedelta(days=follow_up_first_day_interval_today - 1))
 
 
@@ -51,7 +85,7 @@ def isDayCanFollowUp(day):
 canAddFollowUpDayList = []
 canAddFollowUpDayDict = {}
 canAddFollowUpDatetime = today + datetime.timedelta(days=follow_up_first_day_interval_today)
-while len(canAddFollowUpDayList) < maxFollowUpForwardDays:
+while len(canAddFollowUpDayList) < query_follow_up_count_days:
     if isDayCanFollowUp(canAddFollowUpDatetime):
         canAddFollowUpDayList.append(TimeUtils.formatToDayStr(canAddFollowUpDatetime))
     canAddFollowUpDatetime = canAddFollowUpDatetime + datetime.timedelta(days=1)
@@ -155,7 +189,7 @@ while nextPageElement is None or nextPageElement.get_attribute("aria-disabled") 
             EC.visibility_of_element_located((By.CLASS_NAME, "ant-calendar-picker-container-placement-bottomLeft")))
         fullFollowUpDayCount = 0
         for (k, v) in canAddFollowUpDayDict.items():
-            if v < maxEachDayFollowUpNumber:
+            if v < max_each_day_follow_up_count:
                 if currentAllocateDateStr != k:
                     currentAllocateDateStr = k
                     print("currentAllocateDate = %s" % k)
@@ -185,4 +219,4 @@ while nextPageElement is None or nextPageElement.get_attribute("aria-disabled") 
 
 driver.find_elements_by_class_name("_2-cVhQR")[0].click()
 print("follow up over")
-os._exit(1)
+# os._exit(1)

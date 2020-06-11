@@ -118,10 +118,11 @@ def execute_get_in_one_customer(customer_interface_param_dict, jsession_id):
 
 def execute_get_in_interface(lock, customer_dict_pair, jsession_id):
     is_success = interface_request.post(paths.get_in_customer, cookie_dict, customer_dict_pair[0], jsession_id)["success"]
-    lock.acquire()
-    customer_dict_pair[1] = is_success
-    lock.release()
-
+    if is_success:
+        lock.acquire()
+        customer_dict_pair[1] = is_success
+        lock.release()
+        
 
 for index in range(len(tableRows)):
     get_customers_info(index)

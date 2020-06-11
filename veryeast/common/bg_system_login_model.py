@@ -84,7 +84,7 @@ def login(driver: WebDriver):
     imgFilePath = veryeast_config.SCREEN_IMG_DIR + "/img.png"
 
     # 打开后台网址
-    driver.get(veryeast.config.veryeast_info.BG_SYSTEM_URL)
+    driver.get(veryeast.config.veryeast_config.BG_SYSTEM_URL)
     # 获取屏幕缩放因子
     devicePixelRatio = driver.execute_script("return window.devicePixelRatio")
     print("devicePixelRatio=%s" % devicePixelRatio)

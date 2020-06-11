@@ -3,10 +3,19 @@ import calendar
 import datetime
 
 # 年月日 日期格式
+
 FORMAT_YEAR_MONTH_DAY_HYPHEN = "%Y-%m-%d"
 FORMAT_YEAR_MONTH_SECOND_HYPHEN = "%Y-%m-%d %H:%M"
 # 周末索引列表
 weekend_list = [5, 6]
+
+
+def microsecondStr():
+    return str(time.time()).replace(".", "")
+
+
+def microsecond():
+    return int(microsecondStr())
 
 
 def isToday(timestamp: float):
