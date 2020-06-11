@@ -26,10 +26,10 @@ def login(driver: WebDriver, username, pwd, tujian_username=None, tujian_pwd=Non
     # 打开后台网址
     driver.get(veryeast_config.BG_SYSTEM_URL)
 
-    width = driver.execute_script("return document.body.clientWidth")
-    height = driver.execute_script("return document.body.clientHeight")
+    width = driver.execute_script("return window.screen.height")
+    height = driver.execute_script("return window.screen.width")
     print("driver width=%d height=%d" % (width, height))
-    driver.set_window_size(width, height)
+    driver.set_window_size(1366, 768)
     # 输入用户名
     inputUserNameElement = driver.find_element_by_id("username")
     inputUserNameElement.send_keys(username)
@@ -67,6 +67,7 @@ def login(driver: WebDriver, username, pwd, tujian_username=None, tujian_pwd=Non
 def recognize_captcha(driver: WebDriver, imgFilePath, tujian_username=None, tujian_pwd=None):
     # 获取屏幕缩放因子
     devicePixelRatio = driver.execute_script("return window.devicePixelRatio")
+    print("devicePixelRatio = %d" % devicePixelRatio)
     # 识别验证码
     verifyCodeImgElement = driver.find_element_by_id("captcha")
     verify_code_url = verifyCodeImgElement.get_attribute("src")
