@@ -6,7 +6,9 @@ import os
 import sys
 import time
 
+import selenium
 from selenium import webdriver
+from selenium.webdriver.firefox.webdriver import WebDriver as FirefoxWebDriver
 from selenium.webdriver import ActionChains
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import WebDriverWait
@@ -79,12 +81,12 @@ weekend_is_weekdays = ["2020-04-26", "2020-05-09", "2020-06-28", "2020-09-27", "
 
 is_jenkins_execute = len(sys_args) > 1
 # 浏览器
-options = webdriver.FirefoxOptions()
+options = webdriver.ChromeOptions()
 if is_jenkins_execute:
     options.add_argument('--headless')
     options.add_argument('--no-sandbox')
     options.add_argument('--disable-dev-shm-usage')
-driver = webdriver.Firefox(options=options)
+driver = webdriver.Chrome(options=options)
 bg_system_login.login(driver, username, pwd, max_captcha_recognise_times, is_tensorflow_recognise_captcha, tujian_username, tujian_pwd)
 select_three_menus.select(driver, first_menu_index, second_menu_index, third_menu_index)
 
@@ -105,25 +107,73 @@ while len(canAddFollowUpDayList) < query_follow_up_count_days:
     if isDayCanFollowUp(canAddFollowUpDatetime):
         canAddFollowUpDayList.append(TimeUtils.formatToDayStr(canAddFollowUpDatetime))
     canAddFollowUpDatetime = canAddFollowUpDatetime + datetime.timedelta(days=1)
-mainWindow = driver.current_window_handle
 
 
 def clearAndInputCalendar(index, time_str):
-    driver.find_elements_by_class_name("ant-calendar-picker-input")[index].click()
+    if (not time_str):
+        driver.find_elements_by_class_name("ant-calendar-picker-icon")[0].click()
+    else:
+        driver.find_elements_by_class_name("ant-calendar-picker-input")[index].click()
     if index > 0:
-        time.sleep(0.2)  # 防止上次的事件选择框还未消失
+        time.sleep(0.3)  # 防止上次的事件选择框还未消失
     WebDriverWait(driver, 5).until(EC.visibility_of_element_located(
         (By.CLASS_NAME, "ant-calendar-picker-container-placement-bottomLeft")))
     WebDriverWait(driver, 5).until(EC.element_to_be_clickable((By.CLASS_NAME, "ant-calendar-input")))
     followUpInput = driver.find_element_by_class_name("ant-calendar-input")
-    followUpInput.clear()
+    if not type(driver) is selenium.webdriver.firefox.webdriver.WebDriver:
+        # driver.find_elements_by_class_name("ant-calendar-picker-icon")[0].click()
+        driver.execute_script("arguments[0].value='';", followUpInput)
+    else:
+        followUpInput.clear()
     if time_str:
         followUpInput.send_keys(time_str)
 
 
+    # if len(start_time) == 0:
+    #     driver.find_elements_by_class_name("ant-calendar-picker-icon")[0].click()
+    # else:
+    #     driver.find_elements_by_class_name("ant-calendar-picker-input")[0].click()
+    #     WebDriverWait(driver, 5).until(EC.visibility_of_element_located(
+    #         (By.CLASS_NAME, "ant-calendar-picker-container-placement-bottomLeft")))
+    #     WebDriverWait(driver, 5).until(EC.element_to_be_clickable((By.CLASS_NAME, "ant-calendar-input")))
+    #     followUpInput = driver.find_element_by_class_name("ant-calendar-input")
+    #     driver.execute_script("arguments[0].value='';", followUpInput)
+    #     followUpInput.send_keys(start_time)
+    #
+    # driver.find_elements_by_class_name("ant-calendar-picker-input")[1].click()
+    # time.sleep(0.2)  # 防止上次的事件选择框还未消失
+    # WebDriverWait(driver, 5).until(EC.visibility_of_element_located(
+    #     (By.CLASS_NAME, "ant-calendar-picker-container-placement-bottomLeft")))
+    # WebDriverWait(driver, 5).until(EC.element_to_be_clickable((By.CLASS_NAME, "ant-calendar-input")))
+    # followUpInput = driver.find_element_by_class_name("ant-calendar-input")
+    # driver.execute_script("arguments[0].value='';", followUpInput)
+    # followUpInput.send_keys(end_time)
+
+
+
 def resetNextFollowUpTimesAndSearchAgain(start_time, end_time):
-    clearAndInputCalendar(0, start_time)
-    clearAndInputCalendar(1, end_time)
+    if len(start_time) == 0:
+        driver.find_elements_by_class_name("ant-calendar-picker-icon")[0].click()
+    else:
+        driver.find_elements_by_class_name("ant-calendar-picker-input")[0].click()
+        WebDriverWait(driver, 5).until(EC.visibility_of_element_located(
+            (By.CLASS_NAME, "ant-calendar-picker-container-placement-bottomLeft")))
+        WebDriverWait(driver, 5).until(EC.element_to_be_clickable((By.CLASS_NAME, "ant-calendar-input")))
+        followUpInput = driver.find_element_by_class_name("ant-calendar-input")
+        driver.execute_script("arguments[0].value='';", followUpInput)
+        followUpInput.send_keys(start_time)
+
+    driver.find_elements_by_class_name("ant-calendar-picker-input")[1].click()
+    time.sleep(0.2)  # 防止上次的事件选择框还未消失
+    WebDriverWait(driver, 5).until(EC.visibility_of_element_located(
+        (By.CLASS_NAME, "ant-calendar-picker-container-placement-bottomLeft")))
+    WebDriverWait(driver, 5).until(EC.element_to_be_clickable((By.CLASS_NAME, "ant-calendar-input")))
+    followUpInput = driver.find_element_by_class_name("ant-calendar-input")
+    driver.execute_script("arguments[0].value='';", followUpInput)
+    followUpInput.send_keys(end_time)
+
+    # clearAndInputCalendar(0, start_time)
+    # clearAndInputCalendar(1, end_time)
     driver.find_elements_by_class_name("_2-cVhQR")[0].click()  # 搜索
     WebDriverWait(driver, 10).until_not(
         EC.visibility_of_element_located((By.CLASS_NAME, "ant-table-spin-holder")))
@@ -160,7 +210,9 @@ def changePageCountToMax():
     WebDriverWait(driver, 10).until_not(EC.visibility_of_element_located((By.CLASS_NAME, "ant-table-spin-holder")))
 
 
-def follow_up_filtered_customer(currentAllocateDateStr):
+def follow_up_filtered_customer():
+    mainWindow = driver.current_window_handle
+    currentAllocateDateStr = canAddFollowUpDayList[0]
     nextPageElement = None
     while nextPageElement is None or nextPageElement.get_attribute("aria-disabled") == "false":
         if nextPageElement is not None:
@@ -185,8 +237,9 @@ def follow_up_filtered_customer(currentAllocateDateStr):
             lastAllocateDateStr = currentAllocateDateStr
             while canAddFollowUpDayDict.get(currentAllocateDateStr, 0) >= max_each_day_follow_up_count:
                 canAddFollowUpDatetime = TimeUtils.addDays(TimeUtils.parseToDatetime(currentAllocateDateStr), 1)
+                currentAllocateDateStr = TimeUtils.formatToDayStr(canAddFollowUpDatetime)
                 if isDayCanFollowUp(canAddFollowUpDatetime):
-                    currentAllocateDateStr = TimeUtils.formatToDayStr(canAddFollowUpDatetime)
+                    break
             if lastAllocateDateStr != currentAllocateDateStr or currentAllocateDateStr == canAddFollowUpDayList[0]:
                 print("currentAllocateDate = %s" % currentAllocateDateStr)
             nextFollowUpDateElement = nextFollowUpDatePop.find_element_by_class_name("ant-calendar-input")
@@ -194,8 +247,11 @@ def follow_up_filtered_customer(currentAllocateDateStr):
             nextFollowUpDateElement.send_keys(currentAllocateDateStr)
             nextFollowUpDateElement.send_keys(Keys.ENTER)
 
+
+
             driver.find_element_by_class_name("ant-btn-primary").click()
             canAddFollowUpDayDict[currentAllocateDateStr] = canAddFollowUpDayDict.get(currentAllocateDateStr, 0) + 1
+
             driver.switch_to.window(mainWindow)
             # 我的公海iframe区域
             iframe = WebDriverWait(driver, 10).until(EC.visibility_of_element_located((By.TAG_NAME, "iframe")))
@@ -232,8 +288,7 @@ def main():
     #  获取跟进日期在今天以前的数据列表
     resetNextFollowUpTimesAndSearchAgain("", nextFollowUpEndDay)
     # os._exit(1)
-    currentAllocateDateStr = canAddFollowUpDayList[0]
-    follow_up_filtered_customer(currentAllocateDateStr)
+    follow_up_filtered_customer()
 
 
 main()
