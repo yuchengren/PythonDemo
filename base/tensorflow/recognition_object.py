@@ -32,7 +32,7 @@ class Recognizer(network):
             self.keep_prob = tf.compat.v1.placeholder(tf.float32)  # dropout值
             # 加载网络和模型参数
             self.y_predict = self.model()
-            self.predict = tf.argmax(tf.reshape(self.y_predict, [-1, self.max_captcha, self.char_set_len]), 2)
+            self.predict = tf.argmax(input=tf.reshape(self.y_predict, [-1, self.max_captcha, self.char_set_len]), axis=2)
             saver = tf.compat.v1.train.Saver()
             with self.sess.as_default() as sess:
                 saver.restore(sess, self.model_save_dir)

@@ -15,11 +15,11 @@ class network(object):
         self.char_set = char_set
         self.char_set_len = len(char_set)
         self.model_save_dir = model_save_dir  # 模型路径
-        with tf.name_scope('parameters'):
+        with tf.compat.v1.name_scope('parameters'):
             self.w_alpha = 0.01
             self.b_alpha = 0.1
         # tf初始化占位符
-        with tf.name_scope('data'):
+        with tf.compat.v1.name_scope('data'):
             self.X = tf.compat.v1.placeholder(tf.float32, [None, self.image_height * self.image_width])  # 特征向量
             self.Y = tf.compat.v1.placeholder(tf.float32, [None, self.max_captcha * self.char_set_len])  # 标签
             self.keep_prob = tf.compat.v1.placeholder(tf.float32)  # dropout值
@@ -61,44 +61,44 @@ class network(object):
 
         # 卷积层1
         wc1 = tf.compat.v1.get_variable(name='wc1', shape=[3, 3, 1, 32], dtype=tf.float32,
-                              initializer=tf.contrib.layers.xavier_initializer())
+                              initializer=tf.compat.v1.keras.initializers.VarianceScaling(scale=1.0, mode="fan_avg", distribution="uniform"))
         bc1 = tf.Variable(self.b_alpha * tf.random.normal([32]))
-        conv1 = tf.nn.relu(tf.nn.bias_add(tf.nn.conv2d(x, wc1, strides=[1, 1, 1, 1], padding='SAME'), bc1))
+        conv1 = tf.nn.relu(tf.nn.bias_add(tf.nn.conv2d(input=x, filters=wc1, strides=[1, 1, 1, 1], padding='SAME'), bc1))
         conv1 = tf.nn.max_pool2d(conv1, ksize=[1, 2, 2, 1], strides=[1, 2, 2, 1], padding='SAME')
-        conv1 = tf.nn.dropout(conv1, self.keep_prob)
+        conv1 = tf.nn.dropout(conv1, 1 - (self.keep_prob))
 
         # 卷积层2
         wc2 = tf.compat.v1.get_variable(name='wc2', shape=[3, 3, 32, 64], dtype=tf.float32,
-                              initializer=tf.contrib.layers.xavier_initializer())
+                              initializer=tf.compat.v1.keras.initializers.VarianceScaling(scale=1.0, mode="fan_avg", distribution="uniform"))
         bc2 = tf.Variable(self.b_alpha * tf.random.normal([64]))
-        conv2 = tf.nn.relu(tf.nn.bias_add(tf.nn.conv2d(conv1, wc2, strides=[1, 1, 1, 1], padding='SAME'), bc2))
+        conv2 = tf.nn.relu(tf.nn.bias_add(tf.nn.conv2d(input=conv1, filters=wc2, strides=[1, 1, 1, 1], padding='SAME'), bc2))
         conv2 = tf.nn.max_pool2d(conv2, ksize=[1, 2, 2, 1], strides=[1, 2, 2, 1], padding='SAME')
-        conv2 = tf.nn.dropout(conv2, self.keep_prob)
+        conv2 = tf.nn.dropout(conv2, 1 - (self.keep_prob))
 
         # 卷积层3
         wc3 = tf.compat.v1.get_variable(name='wc3', shape=[3, 3, 64, 128], dtype=tf.float32,
-                              initializer=tf.contrib.layers.xavier_initializer())
+                              initializer=tf.compat.v1.keras.initializers.VarianceScaling(scale=1.0, mode="fan_avg", distribution="uniform"))
         bc3 = tf.Variable(self.b_alpha * tf.random.normal([128]))
-        conv3 = tf.nn.relu(tf.nn.bias_add(tf.nn.conv2d(conv2, wc3, strides=[1, 1, 1, 1], padding='SAME'), bc3))
+        conv3 = tf.nn.relu(tf.nn.bias_add(tf.nn.conv2d(input=conv2, filters=wc3, strides=[1, 1, 1, 1], padding='SAME'), bc3))
         conv3 = tf.nn.max_pool2d(conv3, ksize=[1, 2, 2, 1], strides=[1, 2, 2, 1], padding='SAME')
-        conv3 = tf.nn.dropout(conv3, self.keep_prob)
+        conv3 = tf.nn.dropout(conv3, 1 - (self.keep_prob))
         print(">>> convolution 3: ", conv3.shape)
         next_shape = conv3.shape[1] * conv3.shape[2] * conv3.shape[3]
 
         # 全连接层1
         wd1 = tf.compat.v1.get_variable(name='wd1', shape=[next_shape, 1024], dtype=tf.float32,
-                              initializer=tf.contrib.layers.xavier_initializer())
+                              initializer=tf.compat.v1.keras.initializers.VarianceScaling(scale=1.0, mode="fan_avg", distribution="uniform"))
         bd1 = tf.Variable(self.b_alpha * tf.random.normal([1024]))
         dense = tf.reshape(conv3, [-1, wd1.get_shape().as_list()[0]])
         dense = tf.nn.relu(tf.add(tf.matmul(dense, wd1), bd1))
-        dense = tf.nn.dropout(dense, self.keep_prob)
+        dense = tf.nn.dropout(dense, 1 - (self.keep_prob))
 
         # 全连接层2
         wout = tf.compat.v1.get_variable('name', shape=[1024, self.max_captcha * self.char_set_len], dtype=tf.float32,
-                               initializer=tf.contrib.layers.xavier_initializer())
+                               initializer=tf.compat.v1.keras.initializers.VarianceScaling(scale=1.0, mode="fan_avg", distribution="uniform"))
         bout = tf.Variable(self.b_alpha * tf.random.normal([self.max_captcha * self.char_set_len]))
 
-        with tf.name_scope('y_prediction'):
+        with tf.compat.v1.name_scope('y_prediction'):
             y_predict = tf.add(tf.matmul(dense, wout), bout)
 
         return y_predict

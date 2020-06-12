@@ -109,5 +109,5 @@ def tensorflow_recognize(imgFilePath):
 
 
 if __name__ == '__main__':
-    login(webdriver.Firefox(), account.veryeast_username, account.veryeast_pwd,  account.tujian_account, account.tujian_pwd)
+    login(webdriver.Firefox())
     os._exit(1)
