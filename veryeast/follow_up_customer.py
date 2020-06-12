@@ -105,7 +105,6 @@ while len(canAddFollowUpDayList) < query_follow_up_count_days:
     if isDayCanFollowUp(canAddFollowUpDatetime):
         canAddFollowUpDayList.append(TimeUtils.formatToDayStr(canAddFollowUpDatetime))
     canAddFollowUpDatetime = canAddFollowUpDatetime + datetime.timedelta(days=1)
-currentAllocateDateStr = canAddFollowUpDayList[0]
 mainWindow = driver.current_window_handle
 
 
@@ -161,7 +160,7 @@ def changePageCountToMax():
     WebDriverWait(driver, 10).until_not(EC.visibility_of_element_located((By.CLASS_NAME, "ant-table-spin-holder")))
 
 
-def follow_up_filtered_customer():
+def follow_up_filtered_customer(currentAllocateDateStr):
     nextPageElement = None
     while nextPageElement is None or nextPageElement.get_attribute("aria-disabled") == "false":
         if nextPageElement is not None:
@@ -233,7 +232,8 @@ def main():
     #  获取跟进日期在今天以前的数据列表
     resetNextFollowUpTimesAndSearchAgain("", nextFollowUpEndDay)
     # os._exit(1)
-    follow_up_filtered_customer()
+    currentAllocateDateStr = canAddFollowUpDayList[0]
+    follow_up_filtered_customer(currentAllocateDateStr)
 
 
 main()
