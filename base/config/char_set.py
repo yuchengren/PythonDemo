@@ -1,0 +1,2 @@
+
+number_upper_letter = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"
