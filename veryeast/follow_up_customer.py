@@ -13,7 +13,6 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
 import datetime
 
-import veryeast
 from base.config import account
 from base.selenium import ElementUtils
 from veryeast.enum import ConditionEnums
@@ -41,7 +40,7 @@ else:
 if len(sys_args) > 3 and sys_args[3]:
     follow_up_first_day_interval_today = int(sys_args[3])
 else:
-    follow_up_first_day_interval_today = 1
+    follow_up_first_day_interval_today = 0
 # 自动查询将要跟进日期开始往后的日期 跟进客户数量，限制查询的天数，再往后的没有查询到日期，默认当做客户数量为0
 if len(sys_args) > 4 and sys_args[4]:
     query_follow_up_count_days = int(sys_args[4])
@@ -155,70 +154,79 @@ def changePageCountToMax():
     WebDriverWait(driver, 10).until_not(EC.visibility_of_element_located((By.CLASS_NAME, "ant-table-spin-holder")))
 
 
-changePageCountToMax()
-WebDriverWait(driver, 10).until(EC.visibility_of_element_located((By.CLASS_NAME, "_1VePUHA")))  # 筛选条件区域
-WebDriverWait(driver, 5).until(EC.presence_of_element_located((By.CLASS_NAME, "ant-calendar-picker-icon")))
-WebDriverWait(driver, 5).until(EC.presence_of_element_located((By.CLASS_NAME, "ant-calendar-picker-input")))
-# 获取跟进日期在今天以前的数据量
-resetNextFollowUpTimesAndSearchAgain("", nextFollowUpEndDay)
-waitFollowUpTotalNumber = getListTotalNumber()
-print("waitFollowUpTotalNumber=%d" % waitFollowUpTotalNumber)
-if waitFollowUpTotalNumber == 0:
-    if is_jenkins_execute:
-        driver.quit()
-    else:
+def follow_up_filtered_customer():
+    nextPageElement = None
+    while nextPageElement is None or nextPageElement.get_attribute("aria-disabled") == "false":
+        if nextPageElement is not None:
+            driver.find_elements_by_class_name("_2-cVhQR")[0].click()
+            WebDriverWait(driver, 10).until(EC.visibility_of_element_located((By.CLASS_NAME, "ant-table-spin-holder")))
+        WebDriverWait(driver, 10).until_not(EC.visibility_of_element_located((By.CLASS_NAME, "ant-table-spin-holder")))
+        listElement = WebDriverWait(driver, 10).until(
+            EC.visibility_of_element_located((By.CLASS_NAME, "ant-table-tbody")))
+        WebDriverWait(driver, 10).until(EC.visibility_of_all_elements_located((By.CLASS_NAME, "ant-table-row")))
+        listRows = listElement.find_elements_by_class_name("ant-table-row")
+        # 当前页客户的跟进
+        for index, row in enumerate(listRows):
+            row.find_elements_by_tag_name("td")[11].find_element_by_tag_name("a").click()  # 点击跟进客户
+            all_windows = driver.window_handles
+            driver.switch_to.window(all_windows[len(all_windows) - 1])
+            WebDriverWait(driver, 10).until(EC.visibility_of_element_located((By.ID, "dRadioText-101")))
+            # 是否纯粹安排 点击是
+            driver.find_element_by_id("dRadioText-101").find_elements_by_class_name("ant-radio-input")[1].click()
+            driver.find_element_by_class_name("ant-calendar-picker-input").click()
+            nextFollowUpDatePop = WebDriverWait(driver, 10).until(
+                EC.visibility_of_element_located((By.CLASS_NAME, "ant-calendar-picker-container-placement-bottomLeft")))
+            lastAllocateDateStr = currentAllocateDateStr
+            while canAddFollowUpDayDict.get(currentAllocateDateStr, 0) >= max_each_day_follow_up_count:
+                canAddFollowUpDatetime = TimeUtils.addDays(TimeUtils.parseToDatetime(currentAllocateDateStr), 1)
+                if isDayCanFollowUp(canAddFollowUpDatetime):
+                    currentAllocateDateStr = TimeUtils.formatToDayStr(canAddFollowUpDatetime)
+            if lastAllocateDateStr != currentAllocateDateStr or currentAllocateDateStr == canAddFollowUpDayList[0]:
+                print("currentAllocateDate = %s" % currentAllocateDateStr)
+            nextFollowUpDateElement = nextFollowUpDatePop.find_element_by_class_name("ant-calendar-input")
+            driver.execute_script("arguments[0].value='';", nextFollowUpDateElement)
+            nextFollowUpDateElement.send_keys(currentAllocateDateStr)
+            nextFollowUpDateElement.send_keys(Keys.ENTER)
+
+            driver.find_element_by_class_name("ant-btn-primary").click()
+            canAddFollowUpDayDict[currentAllocateDateStr] = canAddFollowUpDayDict.get(currentAllocateDateStr, 0) + 1
+            driver.switch_to.window(mainWindow)
+            # 我的公海iframe区域
+            iframe = WebDriverWait(driver, 10).until(EC.visibility_of_element_located((By.TAG_NAME, "iframe")))
+            driver.switch_to.frame(iframe)
+        # 下一页
+        nextPageElement = driver.find_element_by_class_name("ant-pagination-next")
+
+    driver.find_elements_by_class_name("_2-cVhQR")[0].click()
+    print("follow up over")
+    if not is_jenkins_execute:
         os._exit(1)
 
-# 获取未来指定分配的日期的数据量
-for i in canAddFollowUpDayList:
-    resetNextFollowUpTimesAndSearchAgain(i, i)
-    canAddFollowUpDayDict[i] = getListTotalNumber()
-print(canAddFollowUpDayDict)
-#  获取跟进日期在今天以前的数据列表
-resetNextFollowUpTimesAndSearchAgain("", nextFollowUpEndDay)
 
-nextPageElement = None
-while nextPageElement is None or nextPageElement.get_attribute("aria-disabled") == "false":
-    if nextPageElement is not None:
-        driver.find_elements_by_class_name("_2-cVhQR")[0].click()
-        WebDriverWait(driver, 10).until(EC.visibility_of_element_located((By.CLASS_NAME, "ant-table-spin-holder")))
-    WebDriverWait(driver, 10).until_not(EC.visibility_of_element_located((By.CLASS_NAME, "ant-table-spin-holder")))
-    listElement = WebDriverWait(driver, 10).until(EC.visibility_of_element_located((By.CLASS_NAME, "ant-table-tbody")))
-    WebDriverWait(driver, 10).until(EC.visibility_of_all_elements_located((By.CLASS_NAME, "ant-table-row")))
-    listRows = listElement.find_elements_by_class_name("ant-table-row")
-    # 当前页客户的跟进
-    for index, row in enumerate(listRows):
-        row.find_elements_by_tag_name("td")[11].find_element_by_tag_name("a").click()  # 点击跟进客户
-        all_windows = driver.window_handles
-        driver.switch_to.window(all_windows[len(all_windows) - 1])
-        WebDriverWait(driver, 10).until(EC.visibility_of_element_located((By.ID, "dRadioText-101")))
-        # 是否纯粹安排 点击是
-        driver.find_element_by_id("dRadioText-101").find_elements_by_class_name("ant-radio-input")[1].click()
-        driver.find_element_by_class_name("ant-calendar-picker-input").click()
-        nextFollowUpDatePop = WebDriverWait(driver, 10).until(
-            EC.visibility_of_element_located((By.CLASS_NAME, "ant-calendar-picker-container-placement-bottomLeft")))
-        lastAllocateDateStr = currentAllocateDateStr
-        while canAddFollowUpDayDict.get(currentAllocateDateStr, 0) >= max_each_day_follow_up_count:
-            canAddFollowUpDatetime = TimeUtils.addDays(TimeUtils.parseToDatetime(currentAllocateDateStr), 1)
-            if isDayCanFollowUp(canAddFollowUpDatetime):
-                currentAllocateDateStr = TimeUtils.formatToDayStr(canAddFollowUpDatetime)
-        if lastAllocateDateStr != currentAllocateDateStr or currentAllocateDateStr == canAddFollowUpDayList[0]:
-            print("currentAllocateDate = %s" % currentAllocateDateStr)
-        nextFollowUpDateElement = nextFollowUpDatePop.find_element_by_class_name("ant-calendar-input")
-        driver.execute_script("arguments[0].value='';", nextFollowUpDateElement)
-        nextFollowUpDateElement.send_keys(currentAllocateDateStr)
-        nextFollowUpDateElement.send_keys(Keys.ENTER)
+def main():
+    changePageCountToMax()
+    WebDriverWait(driver, 10).until(EC.visibility_of_element_located((By.CLASS_NAME, "_1VePUHA")))  # 筛选条件区域
+    WebDriverWait(driver, 5).until(EC.presence_of_element_located((By.CLASS_NAME, "ant-calendar-picker-icon")))
+    WebDriverWait(driver, 5).until(EC.presence_of_element_located((By.CLASS_NAME, "ant-calendar-picker-input")))
+    # 获取跟进日期在今天以前的数据量
+    resetNextFollowUpTimesAndSearchAgain("", nextFollowUpEndDay)
+    waitFollowUpTotalNumber = getListTotalNumber()
+    print("waitFollowUpTotalNumber=%d" % waitFollowUpTotalNumber)
+    if waitFollowUpTotalNumber == 0:
+        if is_jenkins_execute:
+            return
+        else:
+            os._exit(1)
 
-        driver.find_element_by_class_name("ant-btn-primary").click()
-        canAddFollowUpDayDict[currentAllocateDateStr] = canAddFollowUpDayDict.get(currentAllocateDateStr, 0) + 1
-        driver.switch_to.window(mainWindow)
-        # 我的公海iframe区域
-        iframe = WebDriverWait(driver, 10).until(EC.visibility_of_element_located((By.TAG_NAME, "iframe")))
-        driver.switch_to.frame(iframe)
-    # 下一页
-    nextPageElement = driver.find_element_by_class_name("ant-pagination-next")
+    # 获取未来指定分配的日期的数据量
+    for i in canAddFollowUpDayList:
+        resetNextFollowUpTimesAndSearchAgain(i, i)
+        canAddFollowUpDayDict[i] = getListTotalNumber()
+    print(canAddFollowUpDayDict)
+    #  获取跟进日期在今天以前的数据列表
+    resetNextFollowUpTimesAndSearchAgain("", nextFollowUpEndDay)
+    follow_up_filtered_customer()
 
-driver.find_elements_by_class_name("_2-cVhQR")[0].click()
-print("follow up over")
-if not is_jenkins_execute:
-    os._exit(1)
+
+main()
+
