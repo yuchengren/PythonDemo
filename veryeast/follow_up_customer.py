@@ -53,12 +53,23 @@ if len(sys_args) > 5 and sys_args[5]:
 else:
     max_each_day_follow_up_count = 55
 
-if len(sys_args) > 6:
-    tujian_username = sys_args[6]
+# 验证码最多执行识别的次数
+if len(sys_args) > 6 and sys_args[6]:
+    max_captcha_recognise_times = int(sys_args[6])
+else:
+    max_captcha_recognise_times = 10
+# 是否用tensorflow做验证码识别
+if len(sys_args) > 7 and sys_args[7]:
+    is_tensorflow_recognise_captcha = sys_args[7] != "false"
+else:
+    is_tensorflow_recognise_captcha = True
+
+if len(sys_args) > 8:
+    tujian_username = sys_args[8]
 else:
     tujian_username = None
-if len(sys_args) > 7:
-    tujian_pwd = sys_args[7]
+if len(sys_args) > 9:
+    tujian_pwd = sys_args[9]
 else:
     tujian_pwd = None
 
@@ -74,7 +85,7 @@ if is_jenkins_execute:
     options.add_argument('--no-sandbox')
     options.add_argument('--disable-dev-shm-usage')
 driver = webdriver.Firefox(options=options)
-bg_system_login.login(driver, username, pwd, tujian_username, tujian_pwd)
+bg_system_login.login(driver, username, pwd, max_captcha_recognise_times, is_tensorflow_recognise_captcha, tujian_username, tujian_pwd)
 select_three_menus.select(driver, first_menu_index, second_menu_index, third_menu_index)
 
 today = datetime.datetime.now()

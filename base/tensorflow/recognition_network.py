@@ -7,6 +7,7 @@ import random
 
 class network(object):
     def __init__(self, image_height, image_width, max_captcha, char_set, model_save_dir):
+        tf.compat.v1.disable_eager_execution()
         # 初始值
         self.image_height = image_height
         self.image_width = image_width
