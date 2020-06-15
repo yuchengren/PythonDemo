@@ -1,6 +1,5 @@
 import os
 
-import selenium
 from selenium import webdriver
 from selenium.common.exceptions import NoSuchElementException
 import time
@@ -8,7 +7,6 @@ import time
 
 from selenium.webdriver.common.by import By
 from selenium.webdriver.remote.webdriver import WebDriver
-from selenium.webdriver.firefox.webdriver import WebDriver as FirefoxWebDriver
 
 from base.api import tujian_api_helper
 from base.config import account, char_set, configs
@@ -32,7 +30,7 @@ def login(driver: WebDriver, username=account.veryeast_username, pwd=account.ver
     width = driver.execute_script("return window.screen.height")
     height = driver.execute_script("return window.screen.width")
     # print("driver width=%d height=%d" % (width, height))
-    driver.set_window_size(1366, 768)
+    driver.set_window_size(1366, 900)
     # 获取屏幕缩放因子
     devicePixelRatio = driver.execute_script("return window.devicePixelRatio")
     print("devicePixelRatio = %d" % devicePixelRatio)
@@ -79,19 +77,30 @@ def login(driver: WebDriver, username=account.veryeast_username, pwd=account.ver
     print("cookiesStr = %s" % CookieUtils.getCookiesStr(driver))
 
 
+# 识别验证码
 def recognize_captcha(driver: WebDriver, devicePixelRatio, imgFilePath, is_tensorflow_recognise_captcha, tujian_username=None, tujian_pwd=None):
-    # 识别验证码
     verifyCodeImgElement = WebDriverWait(driver, 5).until(EC.element_to_be_clickable((By.ID, "captcha")))
-    # verify_code_url = verifyCodeImgElement.get_attribute("src")
-    verifyCodeImgElement.screenshot(imgFilePath)
-    verifyCodeImg = Image.open(imgFilePath)
-    if type(driver) is selenium.webdriver.firefox.webdriver.WebDriver:
-        w, h = verifyCodeImg.size
-        verifyCodeImg.thumbnail((w / devicePixelRatio, h / devicePixelRatio))
+    # 获取验证码位置信息
+    verifyCodeImgLocation = verifyCodeImgElement.location
+    verifyCodeImgSize = verifyCodeImgElement.size
+    verifyCodeImgLeft = verifyCodeImgLocation['x']
+    verifyCodeImgTop = verifyCodeImgLocation['y']
+    verifyCodeImgRight = verifyCodeImgLeft + verifyCodeImgSize['width']
+    verifyCodeImgBottom = verifyCodeImgTop + verifyCodeImgSize['height']
+    # 登录页面全屏截图
+    driver.get_screenshot_as_file(imgFilePath)
+    # 从全屏截图 截取验证码区域
+    verifyCodeImg = Image.open(imgFilePath).crop((verifyCodeImgLeft * devicePixelRatio,
+                                                  verifyCodeImgTop * devicePixelRatio,
+                                                  verifyCodeImgRight * devicePixelRatio,
+                                                  verifyCodeImgBottom * devicePixelRatio))
+    w, h = verifyCodeImg.size
+    verifyCodeImg.thumbnail((w / devicePixelRatio, h / devicePixelRatio))
     verifyCodeImg = verifyCodeImg.convert('L')  # 转换模式 L|RGB
     verifyCodeImg = ImageEnhance.Contrast(verifyCodeImg)  # 增强对比度
     verifyCodeImg = verifyCodeImg.enhance(2.0)  # 增加饱和度
     verifyCodeImg.save(imgFilePath)
+
     if is_tensorflow_recognise_captcha:
         verifyCode = tensorflow_recognize(imgFilePath)
     else:
@@ -109,5 +118,5 @@ def tensorflow_recognize(imgFilePath):
 
 
 if __name__ == '__main__':
-    login(webdriver.Firefox())
+    login(webdriver.Chrome())
     os._exit(1)
