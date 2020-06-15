@@ -15,11 +15,11 @@ import selenium.webdriver.support.expected_conditions as EC
 
 from veryeast.config import veryeast_config
 
-files = os.listdir(veryeast_config.SCREEN_IMG_DIR)
-for f in files:
-    base_name = os.path.basename(f)
-    captcha = base_name.split("_")[0]
-    if len(captcha) != 4:
-        print(base_name)
+imgFilePath = os.environ['HOME'] + "/veryeast_img1/"
+
+for i in os.listdir(imgFilePath):
+    char = os.path.basename(i).split("_")[0]
+    if len(char) != 4:
+        print(char )
 
 

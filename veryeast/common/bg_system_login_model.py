@@ -12,7 +12,6 @@ from selenium.webdriver.common.by import By
 import base.config.account
 from veryeast.config import veryeast_config
 from PIL import Image, ImageEnhance
-import pytesseract
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
@@ -84,7 +83,7 @@ def login(driver: WebDriver):
     imgFilePath = veryeast_config.SCREEN_IMG_DIR + "/img.png"
 
     # 打开后台网址
-    driver.get(veryeast.config.veryeast_config.BG_SYSTEM_URL)
+    driver.get(veryeast_config.BG_SYSTEM_URL)
     # 获取屏幕缩放因子
     devicePixelRatio = driver.execute_script("return window.devicePixelRatio")
     print("devicePixelRatio=%s" % devicePixelRatio)
