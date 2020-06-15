@@ -6,7 +6,7 @@ from selenium import webdriver
 from selenium.webdriver import ActionChains
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.select import Select
-
+from tensorflow.tools.compatibility import tf_upgrade_v2
 
 from base.utils import TimeUtils
 
@@ -21,5 +21,4 @@ for i in os.listdir(imgFilePath):
     char = os.path.basename(i).split("_")[0]
     if len(char) != 4:
         print(char)
-
 

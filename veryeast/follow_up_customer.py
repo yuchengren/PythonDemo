@@ -87,7 +87,8 @@ if is_jenkins_execute:
     options.add_argument('--no-sandbox')
     options.add_argument('--disable-dev-shm-usage')
 driver = webdriver.Chrome(options=options)
-bg_system_login.login(driver, username, pwd, max_captcha_recognise_times, is_tensorflow_recognise_captcha, tujian_username, tujian_pwd)
+bg_system_login.login(driver, username, pwd, max_captcha_recognise_times, is_tensorflow_recognise_captcha,
+                      tujian_username, tujian_pwd)
 select_three_menus.select(driver, first_menu_index, second_menu_index, third_menu_index)
 
 today = datetime.datetime.now()
@@ -118,7 +119,8 @@ def clearAndInputCalendar(index, time_str):
         driver.execute_script("arguments[0].click();", calendar_el)
         WebDriverWait(driver, 5).until(EC.visibility_of_element_located(
             (By.CLASS_NAME, "ant-calendar-picker-container-placement-bottomLeft")))
-        followUpInput = WebDriverWait(driver, 5).until(EC.element_to_be_clickable((By.CLASS_NAME, "ant-calendar-input")))
+        followUpInput = WebDriverWait(driver, 5).until(
+            EC.element_to_be_clickable((By.CLASS_NAME, "ant-calendar-input")))
         followUpInput.send_keys(time_str)
 
 
@@ -154,7 +156,8 @@ def changePageCountToMax():
     page_count_el = page_count_parent_el.find_element_by_class_name("ant-select-selection")
     page_count_el.click()
     page_count_select_pop_id = page_count_el.get_attribute("aria-controls")
-    page_count_select_pop = WebDriverWait(driver, 10).until(EC.visibility_of_element_located((By.ID, page_count_select_pop_id)))
+    page_count_select_pop = WebDriverWait(driver, 10).until(
+        EC.visibility_of_element_located((By.ID, page_count_select_pop_id)))
     page_count_select_options = page_count_select_pop.find_element_by_tag_name("ul").find_elements_by_tag_name("li")
     page_count_select_options[-1].click()
     WebDriverWait(driver, 10).until(EC.visibility_of_element_located((By.CLASS_NAME, "ant-table-spin-holder")))
@@ -162,6 +165,7 @@ def changePageCountToMax():
 
 
 def follow_up_filtered_customer():
+    _canAddFollowUpDatetime = canAddFollowUpDatetime
     mainWindow = driver.current_window_handle
     currentAllocateDateStr = canAddFollowUpDayList[0]
     nextPageElement = None
@@ -186,11 +190,10 @@ def follow_up_filtered_customer():
             nextFollowUpDatePop = WebDriverWait(driver, 10).until(
                 EC.visibility_of_element_located((By.CLASS_NAME, "ant-calendar-picker-container-placement-bottomLeft")))
             lastAllocateDateStr = currentAllocateDateStr
-            while canAddFollowUpDayDict.get(currentAllocateDateStr, 0) >= max_each_day_follow_up_count:
-                canAddFollowUpDatetime = TimeUtils.addDays(TimeUtils.parseToDatetime(currentAllocateDateStr), 1)
-                currentAllocateDateStr = TimeUtils.formatToDayStr(canAddFollowUpDatetime)
-                if isDayCanFollowUp(canAddFollowUpDatetime):
-                    break
+            while canAddFollowUpDayDict.get(currentAllocateDateStr, 0) >= max_each_day_follow_up_count or \
+                    not isDayCanFollowUp(_canAddFollowUpDatetime):
+                _canAddFollowUpDatetime = TimeUtils.addDays(TimeUtils.parseToDatetime(currentAllocateDateStr), 1)
+                currentAllocateDateStr = TimeUtils.formatToDayStr(_canAddFollowUpDatetime)
             if lastAllocateDateStr != currentAllocateDateStr or currentAllocateDateStr == canAddFollowUpDayList[0]:
                 print("currentAllocateDate = %s" % currentAllocateDateStr)
             nextFollowUpDateElement = nextFollowUpDatePop.find_element_by_class_name("ant-calendar-input")
@@ -240,4 +243,3 @@ def main():
 
 
 main()
-
