@@ -172,7 +172,8 @@ def follow_up_filtered_customer():
     while nextPageElement is None or nextPageElement.get_attribute("aria-disabled") == "false":
         if nextPageElement is not None:
             driver.find_elements_by_class_name("_2-cVhQR")[0].click()
-            WebDriverWait(driver, 10).until(EC.visibility_of_element_located((By.CLASS_NAME, "ant-table-spin-holder")))
+            time.sleep(0.2)
+            # WebDriverWait(driver, 10).until(EC.visibility_of_element_located((By.CLASS_NAME, "ant-table-spin-holder")))
         WebDriverWait(driver, 10).until_not(EC.visibility_of_element_located((By.CLASS_NAME, "ant-table-spin-holder")))
         listElement = WebDriverWait(driver, 10).until(
             EC.visibility_of_element_located((By.CLASS_NAME, "ant-table-tbody")))
