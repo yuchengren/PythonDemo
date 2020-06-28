@@ -15,7 +15,7 @@ pipeline{
                 name: 'BELONG_PUBLIC_SEA_INDEX',
                 quoteValue: false,
                 saveJSONParameterToFile: false,
-                type: 'PT_RADIOBUTTONS',
+                type: 'PT_RADIO',
                 propertyFile: "/root/PycharmProjects/PythonDemo/veryeast/config/veryeast.properties",
                 propertyKey: 'BELONG_PUBLIC_SEA_INDEX',
                 descriptionPropertyFile: "/root/PycharmProjects/PythonDemo/veryeast/config/veryeast.properties",
