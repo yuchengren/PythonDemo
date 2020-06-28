@@ -4,6 +4,7 @@ pipeline{
     environment{
         VERYEAST = credentials('veryeast_wife')
         TUJIAN = credentials('tujian')
+        VERYEAST_PROPERTIES_FILE = "./veryeast/config/veryeast.properties"
     }
 
     parameters{
@@ -15,9 +16,9 @@ pipeline{
                 quoteValue: false,
                 saveJSONParameterToFile: false,
                 type: 'PT_RADIO_BUTTONS',
-                propertyFile: "veryeast/config/veryeast.properties",
+                propertyFile: env.VERYEAST_PROPERTIES_FILE,
                 propertyKey: 'BELONG_PUBLIC_SEA_INDEX',
-                descriptionPropertyFile: "veryeast/config/veryeast.properties",
+                descriptionPropertyFile: env.VERYEAST_PROPERTIES_FILE,
                 descriptionPropertyKey: 'BELONG_PUBLIC_SEA_NAME',
                 visibleItemCount: 5)
         extendedChoice(
@@ -28,14 +29,14 @@ pipeline{
                 quoteValue: false,
                 saveJSONParameterToFile: false,
                 type: 'PT_RADIO_BUTTONS',
-                propertyFile: "veryeast/config/veryeast.properties",
+                propertyFile: env.VERYEAST_PROPERTIES_FILE,
                 propertyKey: 'CUSTOMER_SOURCE_INDEX',
-                descriptionPropertyFile: "veryeast/config/veryeast.properties",
+                descriptionPropertyFile: env.VERYEAST_PROPERTIES_FILE,
                 descriptionPropertyKey: 'CUSTOMER_SOURCE_NAME',
                 visibleItemCount: 5)
         string(name: 'GET_IN_CUSTOMER_NAMES', defaultValue: '', description: '揽入客户的名称，多个客户以英文逗号分隔')
         string(name: 'GET_IN_FREQUENCY', defaultValue: '0.01', description: '点击揽入的频率，即每隔多少秒点击一次')
-        string(name: 'max_captcha_recognise_times', defaultValue: '5', description: '验证码最多执行识别的次数')
+        string(name: 'max_captcha_recognise_times', defaultValue: '10', description: '验证码最多执行识别的次数')
         booleanParam(name: 'is_tensorflow_recognise_captcha', defaultValue: true, description: '是否用tensorflow做验证码识别')
     }
 
