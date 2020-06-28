@@ -40,12 +40,12 @@ else:
     pwd = account.veryeast_pwd
 # 筛选条件-所属公海
 if len(sys_args) > 3:
-    public_sea_condition_index = sys_args[3]
+    public_sea_condition_index = int(sys_args[3])
 else:
-    public_sea_condition_index = ConditionEnums.PublicSeaEnum.fourth_part_high_quantity_customer.value
+    public_sea_condition_index = ConditionEnums.PublicSeaEnum.ve_marketing_center.value
 # 筛选条件-客户来源
 if len(sys_args) > 4:
-    customer_source_index = sys_args[4]
+    customer_source_index = int(sys_args[4])
 else:
     customer_source_index = ConditionEnums.CustomerSource.very_east_register.value
 # 要揽入的客户名称，以英文逗号分隔
