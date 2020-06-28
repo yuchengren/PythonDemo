@@ -22,7 +22,7 @@ pipeline{
                 descriptionPropertyKey: 'BELONG_PUBLIC_SEA_NAME',
                 visibleItemCount: 5)
         extendedChoice(
-                defaultValue: '3',
+                defaultValue: '0',
                 description: '客户来源',
                 multiSelectDelimiter: ',',
                 name: 'CUSTOMER_SOURCE_INDEX',
