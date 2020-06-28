@@ -16,9 +16,9 @@ pipeline{
                 quoteValue: false,
                 saveJSONParameterToFile: false,
                 type: 'PT_SINGLE_SELECT',
-                propertyFile: env.VERYEAST_PROPERTIES_FILE,
+                propertyFile: "${env.VERYEAST_PROPERTIES_FILE}",
                 propertyKey: 'BELONG_PUBLIC_SEA_INDEX',
-                descriptionPropertyFile: env.VERYEAST_PROPERTIES_FILE,
+                descriptionPropertyFile: "${env.VERYEAST_PROPERTIES_FILE}",
                 descriptionPropertyKey: 'BELONG_PUBLIC_SEA_NAME',
                 visibleItemCount: 5)
         extendedChoice(
@@ -29,9 +29,9 @@ pipeline{
                 quoteValue: false,
                 saveJSONParameterToFile: false,
                 type: 'PT_SINGLE_SELECT',
-                propertyFile: env.VERYEAST_PROPERTIES_FILE,
+                propertyFile: "/root/PycharmProjects/PythonDemo/veryeast/config/veryeast.properties",
                 propertyKey: 'CUSTOMER_SOURCE_INDEX',
-                descriptionPropertyFile: env.VERYEAST_PROPERTIES_FILE,
+                descriptionPropertyFile: "/root/PycharmProjects/PythonDemo/veryeast/config/veryeast.properties",
                 descriptionPropertyKey: 'CUSTOMER_SOURCE_NAME',
                 visibleItemCount: 5)
         string(name: 'GET_IN_CUSTOMER_NAMES', defaultValue: '', description: '揽入客户的名称，多个客户以英文逗号分隔')
