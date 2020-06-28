@@ -12,7 +12,7 @@ pipeline{
                 defaultValue: '3',
                 description: '所属公海',
                 multiSelectDelimiter: ',',
-                name: 'BELONG_PUBLIC_SEA_INDEX',
+                name: 'BELONG_PUBLIC_SEA',
                 quoteValue: false,
                 saveJSONParameterToFile: false,
                 type: 'PT_RADIO',
@@ -25,7 +25,7 @@ pipeline{
                 defaultValue: '0',
                 description: '客户来源',
                 multiSelectDelimiter: ',',
-                name: 'CUSTOMER_SOURCE_INDEX',
+                name: 'CUSTOMER_SOURCE',
                 quoteValue: false,
                 saveJSONParameterToFile: false,
                 type: 'PT_RADIO',
@@ -43,7 +43,7 @@ pipeline{
     stages{
         stage('follow_up'){
             steps{
-                 sh 'export PYTHONPATH=${WORKSPACE} && python3 ${WORKSPACE}/veryeast/get_in_customer.py "$VERYEAST_USR" "$VERYEAST_PSW" "$BELONG_PUBLIC_SEA_INDEX" "$CUSTOMER_SOURCE_INDEX" "$GET_IN_CUSTOMER_NAMES" "$GET_IN_FREQUENCY" "$max_captcha_recognise_times" "$is_tensorflow_recognise_captcha" "$TUJIAN_USR" "$TUJIAN_PSW" '
+                 sh 'export PYTHONPATH=${WORKSPACE} && python3 ${WORKSPACE}/veryeast/get_in_customer.py "$VERYEAST_USR" "$VERYEAST_PSW" "$BELONG_PUBLIC_SEA" "$CUSTOMER_SOURCE" "$GET_IN_CUSTOMER_NAMES" "$GET_IN_FREQUENCY" "$max_captcha_recognise_times" "$is_tensorflow_recognise_captcha" "$TUJIAN_USR" "$TUJIAN_PSW" '
             }
         }
     }
