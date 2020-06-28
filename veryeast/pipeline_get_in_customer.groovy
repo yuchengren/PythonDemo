@@ -4,7 +4,7 @@ pipeline{
     environment{
         VERYEAST = credentials('veryeast_wife')
         TUJIAN = credentials('tujian')
-        VERYEAST_PROPERTIES_FILE = "./veryeast/config/veryeast.properties"
+        VERYEAST_PROPERTIES_FILE = "/root/PycharmProjects/PythonDemo/veryeast/config/veryeast.properties"
     }
 
     parameters{
@@ -16,9 +16,9 @@ pipeline{
                 quoteValue: false,
                 saveJSONParameterToFile: false,
                 type: 'PT_SINGLE_SELECT',
-                propertyFile: "config/veryeast.properties",
+                propertyFile: env.VERYEAST_PROPERTIES_FILE,
                 propertyKey: 'BELONG_PUBLIC_SEA_INDEX',
-                descriptionPropertyFile: "config/veryeast.properties",
+                descriptionPropertyFile: env.VERYEAST_PROPERTIES_FILE,
                 descriptionPropertyKey: 'BELONG_PUBLIC_SEA_NAME',
                 visibleItemCount: 5)
         extendedChoice(
@@ -29,9 +29,9 @@ pipeline{
                 quoteValue: false,
                 saveJSONParameterToFile: false,
                 type: 'PT_SINGLE_SELECT',
-                propertyFile: "config/veryeast.properties",
+                propertyFile: env.VERYEAST_PROPERTIES_FILE,
                 propertyKey: 'CUSTOMER_SOURCE_INDEX',
-                descriptionPropertyFile: "config/veryeast.properties",
+                descriptionPropertyFile: env.VERYEAST_PROPERTIES_FILE,
                 descriptionPropertyKey: 'CUSTOMER_SOURCE_NAME',
                 visibleItemCount: 5)
         string(name: 'GET_IN_CUSTOMER_NAMES', defaultValue: '', description: '揽入客户的名称，多个客户以英文逗号分隔')
