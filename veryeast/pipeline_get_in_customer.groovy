@@ -16,9 +16,9 @@ pipeline{
                 quoteValue: false,
                 saveJSONParameterToFile: false,
                 type: 'PT_SINGLE_SELECT',
-                propertyFile: "veryeast/config/veryeast.properties",
+                propertyFile: "config/veryeast.properties",
                 propertyKey: 'BELONG_PUBLIC_SEA_INDEX',
-                descriptionPropertyFile: "veryeast/config/veryeast.properties",
+                descriptionPropertyFile: "config/veryeast.properties",
                 descriptionPropertyKey: 'BELONG_PUBLIC_SEA_NAME',
                 visibleItemCount: 5)
         extendedChoice(
@@ -29,9 +29,9 @@ pipeline{
                 quoteValue: false,
                 saveJSONParameterToFile: false,
                 type: 'PT_SINGLE_SELECT',
-                propertyFile: "veryeast/config/veryeast.properties",
+                propertyFile: "config/veryeast.properties",
                 propertyKey: 'CUSTOMER_SOURCE_INDEX',
-                descriptionPropertyFile: "veryeast/config/veryeast.properties",
+                descriptionPropertyFile: "config/veryeast.properties",
                 descriptionPropertyKey: 'CUSTOMER_SOURCE_NAME',
                 visibleItemCount: 5)
         string(name: 'GET_IN_CUSTOMER_NAMES', defaultValue: '', description: '揽入客户的名称，多个客户以英文逗号分隔')
