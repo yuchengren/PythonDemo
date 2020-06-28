@@ -95,6 +95,8 @@ today = time.strftime("%Y-%m-%d")
 startDay = today
 endDDay = today
 
+is_jenkins_execute = len(sys_args) > 1
+
 
 def select_filter_condition(driver):
     # 所属公海筛选-VE营销中心公海
@@ -139,6 +141,10 @@ def select_filter_condition(driver):
 def get_in_customer(customer_index):
     # 浏览器
     options = webdriver.ChromeOptions()
+    if is_jenkins_execute:
+        options.add_argument('--headless')
+        options.add_argument('--no-sandbox')
+        options.add_argument('--disable-dev-shm-usage')
     driver = webdriver.Chrome(options=options)
     bg_system_login.login(driver, username, pwd, max_captcha_recognise_times, is_tensorflow_recognise_captcha,
                       tujian_username, tujian_pwd)
