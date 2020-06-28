@@ -36,7 +36,7 @@ class PublicSeaEnum(Enum):
     recruit_fourth_part_prepare = 1  # 招聘四部筹备公海
     ve_marketing_center_building = 2  # VE营销中心房产公海
     ve_marketing_center = 3  # VE营销中心公海
-    recruit_fourth_part = 4  # 招聘四部d公海
+    recruit_fourth_part = 4  # 招聘四部公海
     recruit_third_part = 5  # 招聘三部公海
 
 

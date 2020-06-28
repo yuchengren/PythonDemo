@@ -1,6 +1,6 @@
+import datetime
 import os
 import time
-from datetime import datetime
 
 from selenium import webdriver
 from selenium.webdriver import ActionChains
@@ -16,9 +16,7 @@ import selenium.webdriver.support.expected_conditions as EC
 from veryeast.config import veryeast_config
 
 imgFilePath = os.environ['HOME'] + "/veryeast_img1/"
-
-for i in os.listdir(imgFilePath):
-    char = os.path.basename(i).split("_")[0]
-    if len(char) != 4:
-        print(char)
+time.time()
+print((TimeUtils.parseToDatetime(str(datetime.date.today()) + " " + str(12) + ":00",
+                                                TimeUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_HYPHEN) - datetime.datetime.now()).seconds)
 

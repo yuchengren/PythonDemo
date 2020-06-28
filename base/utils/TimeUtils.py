@@ -5,7 +5,8 @@ import datetime
 # 年月日 日期格式
 
 FORMAT_YEAR_MONTH_DAY_HYPHEN = "%Y-%m-%d"
-FORMAT_YEAR_MONTH_SECOND_HYPHEN = "%Y-%m-%d %H:%M"
+FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_HYPHEN = "%Y-%m-%d %H:%M"
+FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND_HYPHEN = "%Y-%m-%d %H:%M:%s"
 # 周末索引列表
 weekend_list = [5, 6]
 
@@ -36,6 +37,10 @@ def isToadyWeekday():
     return not isTodayWeekend()
 
 
+def getNowHour():
+    return datetime.datetime.now().hour
+
+
 def isWeekend(_datetime: datetime.datetime):
     return _datetime.weekday() in weekend_list
 
@@ -54,4 +59,5 @@ def parseToDatetime(_str: str,  _format: str = FORMAT_YEAR_MONTH_DAY_HYPHEN):
 
 def addDays(_datetime: datetime.datetime, days: int):
     return _datetime + datetime.timedelta(days=days)
+
 
