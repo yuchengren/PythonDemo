@@ -4,10 +4,15 @@ pipeline{
     environment{
         VERYEAST = credentials('veryeast_wife')
         TUJIAN = credentials('tujian')
+        EXECUTE_RESULT_DINGTALK_TOKEN = "a7d885f520f284ccd09561919c8d1c4a3c9fa54d3c3d2b294b0778e3ce5c4574" //执行结果状态的通知
     }
 
     triggers{
         cron('0 19 * * *')
+    }
+
+    options{
+        retry(2)
     }
 
     parameters{
@@ -22,6 +27,15 @@ pipeline{
         stage('follow_up'){
             steps{
                  sh 'export PYTHONPATH=${WORKSPACE} && python3 ${WORKSPACE}/veryeast/follow_up_customer.py "$VERYEAST_USR" "$VERYEAST_PSW" "$follow_up_first_day_interval_today" "$query_follow_up_count_days" "$max_each_day_follow_up_count" "$max_captcha_recognise_times" "$is_tensorflow_recognise_captcha" "$TUJIAN_USR" "$TUJIAN_PSW" '
+            }
+        }
+    }
+
+    post {
+        failure {
+            wrap([$class: 'BuildUser']) {
+                sh "export PYTHONPATH=$WORKSPACE && python3 $WORKSPACE/android/jenkins/execute_result_dingtalk.py ${env.BUILD_USER_ID} $JENKINS_URL $JOB_NAME $BUILD_ID  ${currentBuild.currentResult} $EXECUTE_RESULT_DINGTALK_TOKEN  "
+                cleanWs()
             }
         }
     }
