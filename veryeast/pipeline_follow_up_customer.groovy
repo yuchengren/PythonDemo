@@ -34,7 +34,7 @@ pipeline{
     post {
         failure {
             wrap([$class: 'BuildUser']) {
-                sh "export PYTHONPATH=$WORKSPACE && python3 $WORKSPACE/android/jenkins/execute_result_dingtalk.py ${env.BUILD_USER_ID} $JENKINS_URL $JOB_NAME $BUILD_ID  ${currentBuild.currentResult} $EXECUTE_RESULT_DINGTALK_TOKEN  "
+                sh "export PYTHONPATH=$WORKSPACE && python3 $WORKSPACE/jenkins/execute_result_dingtalk.py ${env.BUILD_USER_ID} $JENKINS_URL $JOB_NAME $BUILD_ID  ${currentBuild.currentResult} $EXECUTE_RESULT_DINGTALK_TOKEN  "
                 cleanWs()
             }
         }
