@@ -11,9 +11,9 @@ pipeline{
         cron('0 19 * * *')
     }
 
-//     options{
-//         retry(2)
-//     }
+    options{
+        retry(2)
+    }
 
     parameters{
         string(name: 'follow_up_first_day_interval_today', defaultValue: '1', description: '将要跟进客户的日期距离今天的天数')
