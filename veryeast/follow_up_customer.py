@@ -80,6 +80,7 @@ can_not_follow_up_days = ["2020-05-01", "2020-05-04", "2020-05-05", "2020-06-25"
 weekend_is_weekdays = ["2020-04-26", "2020-05-09", "2020-06-28", "2020-09-27", "2020-10-10"]
 
 is_jenkins_execute = len(sys_args) > 1
+raise Exception("test")
 # 浏览器
 options = webdriver.ChromeOptions()
 if is_jenkins_execute:
