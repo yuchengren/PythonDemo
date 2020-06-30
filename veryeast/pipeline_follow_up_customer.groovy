@@ -7,13 +7,13 @@ pipeline{
         EXECUTE_RESULT_DINGTALK_TOKEN = "a7d885f520f284ccd09561919c8d1c4a3c9fa54d3c3d2b294b0778e3ce5c4574" //执行结果状态的通知
     }
 
-    triggers{
-        cron('0 19 * * *')
-    }
+//     triggers{
+//         cron('0 19 * * *')
+//     }
 
-    options{
-        retry(2)
-    }
+//     options{
+//         retry(2)
+//     }
 
     parameters{
         string(name: 'follow_up_first_day_interval_today', defaultValue: '1', description: '将要跟进客户的日期距离今天的天数')
@@ -35,7 +35,7 @@ pipeline{
         failure {
             wrap([$class: 'BuildUser']) {
                 sh "export PYTHONPATH=$WORKSPACE && python3 $WORKSPACE/jenkins/execute_result_dingtalk.py ${env.BUILD_USER_ID} ${env.JENKINS_URL} ${env.JOB_NAME} ${env.BUILD_ID} ${currentBuild.currentResult} $EXECUTE_RESULT_DINGTALK_TOKEN  "
-                cleanWs()
+//                 cleanWs()
             }
         }
     }
