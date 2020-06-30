@@ -8,11 +8,11 @@ pipeline{
     }
 
     triggers{
-        cron('9 11 * * *')
+        cron('0 19 * * *')
     }
 
     options{
-        retry(2)
+        retry(3)
     }
 
     parameters{
