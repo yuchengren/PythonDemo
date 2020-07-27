@@ -181,7 +181,13 @@ def follow_up_filtered_customer():
         listRows = listElement.find_elements_by_class_name("ant-table-row")
         # 当前页客户的跟进
         for index, row in enumerate(listRows):
-            row.find_elements_by_tag_name("td")[11].find_element_by_tag_name("a").click()  # 点击跟进客户
+            tds = row.find_elements_by_tag_name("td")
+            for td in tds:
+                a = ElementUtils.findElement(td, By.TAG_NAME, "a")
+                if a and a.text == "跟进客户":
+                    a.click()
+                    break
+            # row.find_elements_by_tag_name("td")[11].find_element_by_tag_name("a").click()  # 点击跟进客户
             all_windows = driver.window_handles
             driver.switch_to.window(all_windows[len(all_windows) - 1])
             WebDriverWait(driver, 10).until(EC.visibility_of_element_located((By.ID, "dRadioText-101")))

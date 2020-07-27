@@ -30,7 +30,7 @@ def login(driver: WebDriver, username=account.veryeast_username, pwd=account.ver
     width = driver.execute_script("return window.screen.height")
     height = driver.execute_script("return window.screen.width")
     # print("driver width=%d height=%d" % (width, height))
-    driver.set_window_size(1366, 900)
+    driver.set_window_size(1500, 900)
     # 获取屏幕缩放因子
     devicePixelRatio = driver.execute_script("return window.devicePixelRatio")
     print("devicePixelRatio = %d" % devicePixelRatio)
