@@ -1,6 +1,10 @@
 pipeline{
     agent any
 
+    options {
+        buildDiscarder logRotator(artifactDaysToKeepStr: '14', artifactNumToKeepStr: '20', daysToKeepStr: '14', numToKeepStr: '20')
+    }
+
     environment{
         VERYEAST = credentials('veryeast_wife')
         TUJIAN = credentials('tujian')
