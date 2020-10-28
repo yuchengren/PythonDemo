@@ -3,6 +3,7 @@ pipeline{
 
     options {
         buildDiscarder logRotator(artifactDaysToKeepStr: '14', artifactNumToKeepStr: '20', daysToKeepStr: '14', numToKeepStr: '20')
+        retry(3)
     }
 
     environment{
@@ -13,10 +14,6 @@ pipeline{
 
     triggers{
         cron('0 20 * * *')
-    }
-
-    options{
-        retry(3)
     }
 
     parameters{
