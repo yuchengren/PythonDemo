@@ -220,8 +220,6 @@ def follow_up_filtered_customer():
 
     driver.find_elements_by_class_name("_2-cVhQR")[0].click()
     print("follow up over")
-    if not is_jenkins_execute:
-        os._exit(1)
 
 
 def main():
