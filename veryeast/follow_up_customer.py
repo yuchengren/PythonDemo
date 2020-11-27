@@ -8,6 +8,7 @@ import time
 
 import selenium
 from selenium import webdriver
+from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.firefox.webdriver import WebDriver as FirefoxWebDriver
 from selenium.webdriver import ActionChains
 from selenium.webdriver.common.keys import Keys
@@ -80,19 +81,19 @@ can_not_follow_up_days = ["2020-05-01", "2020-05-04", "2020-05-05", "2020-06-25"
 weekend_is_weekdays = ["2020-04-26", "2020-05-09", "2020-06-28", "2020-09-27", "2020-10-10"]
 
 is_jenkins_execute = len(sys_args) > 1
+
+today = datetime.datetime.now()
+nextFollowUpEndDay = TimeUtils.formatToDayStr(today + datetime.timedelta(days=follow_up_first_day_interval_today - 1))
 # 浏览器
 options = webdriver.ChromeOptions()
 if is_jenkins_execute:
     options.add_argument('--headless')
     options.add_argument('--no-sandbox')
     options.add_argument('--disable-dev-shm-usage')
+c_service = Service('chromedriver')
+c_service.command_line_args()
+c_service.start()
 driver = webdriver.Chrome(options=options)
-bg_system_login.login(driver, username, pwd, max_captcha_recognise_times, is_tensorflow_recognise_captcha,
-                      tujian_username, tujian_pwd)
-select_three_menus.select(driver, first_menu_index, second_menu_index, third_menu_index)
-
-today = datetime.datetime.now()
-nextFollowUpEndDay = TimeUtils.formatToDayStr(today + datetime.timedelta(days=follow_up_first_day_interval_today - 1))
 
 
 def isDayCanFollowUp(day):
@@ -224,6 +225,9 @@ def follow_up_filtered_customer():
 
 
 def main():
+    bg_system_login.login(driver, username, pwd, max_captcha_recognise_times, is_tensorflow_recognise_captcha,
+                          tujian_username, tujian_pwd)
+    select_three_menus.select(driver, first_menu_index, second_menu_index, third_menu_index)
     changePageCountToMax()
     WebDriverWait(driver, 10).until(EC.visibility_of_element_located((By.CLASS_NAME, "_1VePUHA")))  # 筛选条件区域
     WebDriverWait(driver, 5).until(EC.presence_of_all_elements_located((By.CLASS_NAME, "ant-calendar-picker-icon")))
@@ -233,10 +237,9 @@ def main():
     waitFollowUpTotalNumber = getListTotalNumber()
     print("waitFollowUpTotalNumber=%d" % waitFollowUpTotalNumber)
     if waitFollowUpTotalNumber == 0:
-        if is_jenkins_execute:
-            return
-        else:
+        if not is_jenkins_execute:
             os._exit(1)
+        return
 
     # 获取未来指定分配的日期的数据量
     for i in canAddFollowUpDayList:
@@ -245,8 +248,14 @@ def main():
     print(canAddFollowUpDayDict)
     #  获取跟进日期在今天以前的数据列表
     resetNextFollowUpTimesAndSearchAgain("", nextFollowUpEndDay)
-    # os._exit(1)
     follow_up_filtered_customer()
+    if not is_jenkins_execute:
+        os._exit(1)
 
-
-main()
+try:
+    main()
+finally:
+    if is_jenkins_execute:
+        print("driver quit")
+        driver.quit()
+        c_service.stop()
