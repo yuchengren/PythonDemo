@@ -83,6 +83,9 @@ weekend_is_weekdays = ["2020-04-26", "2020-05-09", "2020-06-28", "2020-09-27", "
 is_jenkins_execute = len(sys_args) > 1
 
 today = datetime.datetime.now()
+# nextFollowUpStartDay = TimeUtils.formatToDayStr(today + datetime.timedelta(days=follow_up_first_day_interval_today + 8))
+# nextFollowUpEndDay = TimeUtils.formatToDayStr(today + datetime.timedelta(days=follow_up_first_day_interval_today + 12))
+nextFollowUpStartDay = ""
 nextFollowUpEndDay = TimeUtils.formatToDayStr(today + datetime.timedelta(days=follow_up_first_day_interval_today - 1))
 # 浏览器
 options = webdriver.ChromeOptions()
@@ -231,7 +234,7 @@ def main():
     WebDriverWait(driver, 5).until(EC.presence_of_all_elements_located((By.CLASS_NAME, "ant-calendar-picker-icon")))
     WebDriverWait(driver, 5).until(EC.presence_of_all_elements_located((By.CLASS_NAME, "ant-calendar-picker-input")))
     # 获取跟进日期在今天以前的数据量
-    resetNextFollowUpTimesAndSearchAgain("", nextFollowUpEndDay)
+    resetNextFollowUpTimesAndSearchAgain(nextFollowUpStartDay, nextFollowUpEndDay)
     waitFollowUpTotalNumber = getListTotalNumber()
     print("waitFollowUpTotalNumber=%d" % waitFollowUpTotalNumber)
     if waitFollowUpTotalNumber == 0:
@@ -245,7 +248,7 @@ def main():
         canAddFollowUpDayDict[i] = getListTotalNumber()
     print(canAddFollowUpDayDict)
     #  获取跟进日期在今天以前的数据列表
-    resetNextFollowUpTimesAndSearchAgain("", nextFollowUpEndDay)
+    resetNextFollowUpTimesAndSearchAgain(nextFollowUpStartDay, nextFollowUpEndDay)
     follow_up_filtered_customer()
     if not is_jenkins_execute:
         os._exit(1)
