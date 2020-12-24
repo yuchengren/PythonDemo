@@ -169,16 +169,23 @@ def changePageCountToMax():
     WebDriverWait(driver, 10).until_not(EC.visibility_of_element_located((By.CLASS_NAME, "ant-table-spin-holder")))
 
 
-def follow_up_filtered_customer():
+def switchToMainWindowFrame(main_window):
+    driver.switch_to.window(main_window)
+    # 我的公海iframe区域
+    iframe = WebDriverWait(driver, 10).until(EC.visibility_of_element_located((By.TAG_NAME, "iframe")))
+    driver.switch_to.frame(iframe)
+
+
+def follow_up_filtered_customer(waitFollowUpTotalNumber):
+    can_not_follow_up_customer_names = []
     _canAddFollowUpDatetime = canAddFollowUpDatetime
     mainWindow = driver.current_window_handle
     currentAllocateDateStr = canAddFollowUpDayList[0]
-    nextPageElement = None
-    while nextPageElement is None or nextPageElement.get_attribute("aria-disabled") == "false":
-        if nextPageElement is not None:
+    has_follow_up_customer_num = 0
+    while has_follow_up_customer_num + len(can_not_follow_up_customer_names) < waitFollowUpTotalNumber:
+        if has_follow_up_customer_num != 0:
             driver.find_elements_by_class_name("_2-cVhQR")[0].click()
             time.sleep(0.2)
-            # WebDriverWait(driver, 10).until(EC.visibility_of_element_located((By.CLASS_NAME, "ant-table-spin-holder")))
         WebDriverWait(driver, 10).until_not(EC.visibility_of_element_located((By.CLASS_NAME, "ant-table-spin-holder")))
         listElement = WebDriverWait(driver, 10).until(
             EC.visibility_of_element_located((By.CLASS_NAME, "ant-table-tbody")))
@@ -187,6 +194,9 @@ def follow_up_filtered_customer():
         # 当前页客户的跟进
         for index, row in enumerate(listRows):
             tds = row.find_elements_by_tag_name("td")
+            customer_name = tds[1].find_element_by_tag_name("a").find_element_by_tag_name("span").text.strip()
+            if customer_name in can_not_follow_up_customer_names:
+                continue
             for td in tds:
                 a = ElementUtils.findElement(td, By.TAG_NAME, "a")
                 if a and a.text == "跟进客户":
@@ -195,6 +205,13 @@ def follow_up_filtered_customer():
             # row.find_elements_by_tag_name("td")[11].find_element_by_tag_name("a").click()  # 点击跟进客户
             all_windows = driver.window_handles
             driver.switch_to.window(all_windows[len(all_windows) - 1])
+            el_follow_way = WebDriverWait(driver, 10).until(EC.visibility_of_element_located((By.CLASS_NAME, "ant-select-selection__rendered")))
+            el_follow_way_text = el_follow_way.find_element_by_class_name("ant-select-selection-selected-value").text
+            if el_follow_way_text is None or el_follow_way_text.strip() == "":
+                can_not_follow_up_customer_names.append(customer_name)
+                switchToMainWindowFrame(mainWindow)
+                continue
+
             WebDriverWait(driver, 10).until(EC.visibility_of_element_located((By.ID, "dRadioText-101")))
             # 是否纯粹安排 点击是
             driver.find_element_by_id("dRadioText-101").find_elements_by_class_name("ant-radio-input")[1].click()
@@ -214,15 +231,11 @@ def follow_up_filtered_customer():
             nextFollowUpDateElement.send_keys(Keys.ENTER)
             driver.find_element_by_class_name("ant-btn-primary").click()
             canAddFollowUpDayDict[currentAllocateDateStr] = canAddFollowUpDayDict.get(currentAllocateDateStr, 0) + 1
-
-            driver.switch_to.window(mainWindow)
-            # 我的公海iframe区域
-            iframe = WebDriverWait(driver, 10).until(EC.visibility_of_element_located((By.TAG_NAME, "iframe")))
-            driver.switch_to.frame(iframe)
-        # 下一页
-        nextPageElement = driver.find_element_by_class_name("ant-pagination-next")
+            switchToMainWindowFrame(mainWindow)
+            has_follow_up_customer_num += 1
 
     driver.find_elements_by_class_name("_2-cVhQR")[0].click()
+    print("%d can_not_follow_up_customer_names=%s" % (len(can_not_follow_up_customer_names), can_not_follow_up_customer_names))
     print("follow up over")
 
 
@@ -250,7 +263,7 @@ def main():
     print(canAddFollowUpDayDict)
     #  获取跟进日期在今天以前的数据列表
     resetNextFollowUpTimesAndSearchAgain(nextFollowUpStartDay, nextFollowUpEndDay)
-    follow_up_filtered_customer()
+    follow_up_filtered_customer(waitFollowUpTotalNumber)
     if not is_jenkins_execute:
         os._exit(1)
 
