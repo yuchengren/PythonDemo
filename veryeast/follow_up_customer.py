@@ -176,6 +176,19 @@ def switchToMainWindowFrame(main_window):
     driver.switch_to.frame(iframe)
 
 
+def handle_customer_must_options(el_must_selects, index, pop_index, option_index):
+    has_show_pop = False
+    el_must_option = el_must_selects[index]
+    el_follow_way_text = el_must_option.find_element_by_class_name("ant-select-selection-selected-value").text
+    if el_follow_way_text.strip() == "":
+        el_must_option.click()
+        el_must_option_pops = WebDriverWait(driver, 10).until(
+            EC.presence_of_all_elements_located((By.CLASS_NAME, "ant-select-dropdown-menu-vertical")))
+        has_show_pop = True
+        el_must_option_pops[pop_index].find_elements_by_tag_name("li")[option_index].click()
+    return has_show_pop
+
+
 def follow_up_filtered_customer(waitFollowUpTotalNumber):
     can_not_follow_up_customer_names = []
     _canAddFollowUpDatetime = canAddFollowUpDatetime
@@ -185,7 +198,9 @@ def follow_up_filtered_customer(waitFollowUpTotalNumber):
     while has_follow_up_customer_num + len(can_not_follow_up_customer_names) < waitFollowUpTotalNumber:
         if has_follow_up_customer_num != 0:
             driver.find_elements_by_class_name("_2-cVhQR")[0].click()
-            time.sleep(0.2)
+            if getListTotalNumber() == 0:
+                break
+
         WebDriverWait(driver, 10).until_not(EC.visibility_of_element_located((By.CLASS_NAME, "ant-table-spin-holder")))
         listElement = WebDriverWait(driver, 10).until(
             EC.visibility_of_element_located((By.CLASS_NAME, "ant-table-tbody")))
@@ -205,12 +220,17 @@ def follow_up_filtered_customer(waitFollowUpTotalNumber):
             # row.find_elements_by_tag_name("td")[11].find_element_by_tag_name("a").click()  # 点击跟进客户
             all_windows = driver.window_handles
             driver.switch_to.window(all_windows[len(all_windows) - 1])
-            el_follow_way = WebDriverWait(driver, 10).until(EC.visibility_of_element_located((By.CLASS_NAME, "ant-select-selection__rendered")))
-            el_follow_way_text = el_follow_way.find_element_by_class_name("ant-select-selection-selected-value").text
-            if el_follow_way_text is None or el_follow_way_text.strip() == "":
-                can_not_follow_up_customer_names.append(customer_name)
-                switchToMainWindowFrame(mainWindow)
-                continue
+            el_must_selects = WebDriverWait(driver, 10).until(
+                EC.visibility_of_all_elements_located((By.CLASS_NAME, "ant-select-selection__rendered")))
+            must_selects_has_show_pop_num = 0
+            for i in range(3):
+                pop_options_index = 0
+                if i == 0:
+                    pop_options_index = 1
+                elif i == 2:
+                    pop_options_index = 7
+                if handle_customer_must_options(el_must_selects, i, must_selects_has_show_pop_num, pop_options_index):
+                    must_selects_has_show_pop_num += 1
 
             WebDriverWait(driver, 10).until(EC.visibility_of_element_located((By.ID, "dRadioText-101")))
             # 是否纯粹安排 点击是
